@@ -43,6 +43,8 @@ dependencies:
   shared_preferences: ^2.3.2
   custom_sliding_segmented_control: ^1.8.3
   blur: ^4.0.0
+  syncfusion_flutter_charts: ^26.2.14
+
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +74,8 @@ flutter:
     - assets/create_account/
     - assets/logo/
     - assets/home/
+    - assets/consult/
+    - assets/tracker/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

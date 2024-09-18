@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
+import 'package:kaustubha_medtech/models/user/user_info.dart';
 import 'package:provider/provider.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/sign_up_provider.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_back_button.dart';
@@ -101,19 +103,21 @@ class _VerifySignOTPState extends State<VerifySignOTP> {
   void registerNumber(SignUpProvider provider,String otp)async{
     Map<String,dynamic> data=provider.signUpModel.toJson();
     data['otp']=otp;
-    provider.signUpWithNumber(data, onSignUpNumberResponse);
+    provider.signUpWithNumber(data, onSignUpResponse);
   }
 
   void verifyEmail(SignUpProvider provider,String otp)async{
-    Map<String,dynamic> data= {'otp':otp};
-    provider.verifyEmail(data, onSignUpNumberResponse);
+    Map<String,dynamic> data= {'otp':otp,'email':email};
+    provider.verifyEmail(data, onSignUpResponse);
   }
 
 
-  void onSignUpNumberResponse(ResponseMessage message) {
-    if (message.email != null || message.success!=null) {
-      CustomPopUp.showSnackBar(context, "${email ?? ""} Registered Successfully", Colors.green);
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.login,(r)=>false);
+  void onSignUpResponse(ResponseMessage message) {
+    if (message.user != null || message.success!=null) {
+      CustomPopUp.showSnackBar(context, "${email ?? number ?? ""} Registered Successfully", Colors.green);
+      LocalDB.setUserLogin(true);
+      LocalDB.setUserInfo(message.user ?? UserInfo());
+      Navigator.pushNamedAndRemoveUntil(context,RoutesName.main,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }
@@ -122,8 +126,7 @@ class _VerifySignOTPState extends State<VerifySignOTP> {
  void verifyOTP(SignUpProvider provider)async {
    String otp = otp1.text + otp2.text + otp3.text + otp4.text + otp5.text +
        otp6.text;
-   if(otp1.text.isNotEmpty && otp2.text.isNotEmpty && otp3.text.isNotEmpty &&
-       otp4.text.isNotEmpty && otp5.text.isNotEmpty && otp6.text.isNotEmpty ) {
+   if(otp.length==6) {
      if(number!=null){
        registerNumber(provider, otp);
      }else{

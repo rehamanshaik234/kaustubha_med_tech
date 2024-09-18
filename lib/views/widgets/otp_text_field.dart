@@ -23,7 +23,6 @@ class OtpTextField extends StatelessWidget {
         controller: textEditingController,
         onChanged: (text){
           nextFocus();
-          print("nextfocus called******************************************************");
           if(text.isNotEmpty){
             textEditingController.text=text[text.length-1];
           }else{

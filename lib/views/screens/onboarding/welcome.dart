@@ -7,6 +7,8 @@ import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_outline_button.dart';
 import 'package:kaustubha_medtech/views/widgets/logo.dart';
 
+import '../../../controller/localdb/local_db.dart';
+
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
@@ -15,11 +17,22 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool loader=true;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      getUserInfo();
+    });
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
+      body: loader?const Center(child: CircularProgressIndicator(color: Colors.black,),): Padding(
         padding: EdgeInsets.all(16.sp),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -47,5 +60,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
       ),
     );
+  }
+
+  void getUserInfo()async{
+    bool isLogin=await LocalDB.getUserLogin();
+    if(isLogin){
+      Navigator.pushNamedAndRemoveUntil(context, RoutesName.main, (r)=>false);
+      return;
+    }
+    loader=false;
+    setState(() {
+
+    });
   }
 }

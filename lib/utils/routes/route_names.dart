@@ -28,4 +28,23 @@ class RoutesName {
 
   ///home
   static const String home = "home";
+
+  ///appointments
+  static const String appointments = "appointments";
+  static const String reScheduleAppointment = "re_schedule_appointment";
+  static const String addReview = "add_review";
+
+
+  ///consult
+  static const String consult = "consult";
+  static const String doctorDetails = "doctor_details";
+  static const String bookAppointment = "book_appointment";
+
+  ///chat
+  static const String chat = "chat";
+
+  ///tracker
+  static const String tracker = "tracker";
+
+
 }

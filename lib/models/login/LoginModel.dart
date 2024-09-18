@@ -48,7 +48,7 @@ class LoginModel {
       map['role'] = _role;
     }
     if (_email != null) {
-      map['email'] = _email;
+      map['identifier'] = _email;
     }
     if (_phone != null) {
       map['phone'] = _phone;

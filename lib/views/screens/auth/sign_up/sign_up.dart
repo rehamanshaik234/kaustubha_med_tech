@@ -164,8 +164,6 @@ class _CreateAccountState extends State<CreateAccount> {
   }
 
 
-
-
   void onSignUpEmailResponse(ResponseMessage message) {
     if (message.success != null) {
       Map<String, dynamic>? arguments = {'email': email.text};

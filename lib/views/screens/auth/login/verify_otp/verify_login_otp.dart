@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/login_provider.dart';
 import 'package:kaustubha_medtech/models/login/LoginModel.dart';
+import 'package:kaustubha_medtech/models/user/user_info.dart';
 import 'package:provider/provider.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/sign_up_provider.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_back_button.dart';
@@ -102,14 +104,15 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
 
   void verifyLoginOtp(LoginProvider provider,String otp)async{
     Map<String,dynamic> data=LoginModel(phone: number,otp: otp).toJson();
-    provider.verifyLoginNumberOTP(data, onSignUpNumberResponse);
+    provider.verifyLoginNumberOTP(data, onLoginNumberResponse);
   }
 
-
-  void onSignUpNumberResponse(ResponseMessage message) {
+  void onLoginNumberResponse(ResponseMessage message) {
     if (message.success != null) {
-      CustomPopUp.showSnackBar(context, "$email Registered Successfully", Colors.green);
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.login,(r)=>false);
+      CustomPopUp.showSnackBar(context, "Login Successfully", Colors.green);
+      LocalDB.setUserLogin(true);
+      LocalDB.setUserInfo(message.user ?? UserInfo());
+      Navigator.pushNamedAndRemoveUntil(context,RoutesName.main,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }

@@ -31,13 +31,18 @@ class _RouteAwareWidgetState extends State<RouteAwareWidget> with RouteAware {
     super.dispose();
   }
 
-
-
   @override
   void didPushNext() {
     widget.onPop(widget.routeName);
     // TODO: implement didPushNext
     super.didPushNext();
+  }
+
+  @override
+  void didPopNext() {
+    widget.onPop(widget.routeName);
+    // TODO: implement didPopNext
+    super.didPopNext();
   }
 
 

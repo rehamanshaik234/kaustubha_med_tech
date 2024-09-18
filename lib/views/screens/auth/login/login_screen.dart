@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/login_provider.dart';
 import 'package:kaustubha_medtech/models/login/LoginModel.dart';
+import 'package:kaustubha_medtech/models/user/user_info.dart';
 import 'package:kaustubha_medtech/utils/constants/asset_urls.dart';
 import 'package:kaustubha_medtech/utils/routes/route_names.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
@@ -108,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void logInWithEmailPwd(LoginProvider provider)async{
     if(validateEmail()){
       LoginModel loginModel=LoginModel(email: emailOrNumber.text,password: password.text);
-      provider.loginWithEmilPwd(loginModel, onSignUpEmailResponse);
+      provider.loginWithEmilPwd(loginModel, onLoginEmailResponse);
     }
   }
 
@@ -136,9 +138,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void onSignUpEmailResponse(ResponseMessage message) {
+  void onLoginEmailResponse(ResponseMessage message) {
     if (message.success != null) {
       CustomPopUp.showSnackBar(context, "${message.success}", Colors.greenAccent);
+      LocalDB.setUserLogin(true);
+      LocalDB.setUserInfo(message.user ?? UserInfo());
+      Navigator.pushNamedAndRemoveUntil(context,RoutesName.main,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }

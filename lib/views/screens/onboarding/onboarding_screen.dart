@@ -9,6 +9,8 @@ import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_circular_progress.dart';
 import 'package:kaustubha_medtech/views/widgets/logo.dart';
 
+import '../../../controller/localdb/local_db.dart';
+
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -19,9 +21,21 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   PageController pageController=PageController(initialPage: 0);
   int currentPage=0;
+  bool loader=true;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      checkIsShown();
+    });
+    // TODO: implement initState
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return loader?const Center(child: CircularProgressIndicator(color: Colors.black,),): SizedBox(
       height: 1.sh,
       width: 1.sw,
       child: Stack(
@@ -68,7 +82,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         width: 70.w,height: 40.h,
                         child: TextButton(onPressed: (){
                           if(currentPage<3){
-                            pageController.animateToPage(currentPage+1, duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
+                            pageController.jumpToPage(currentPage+1);
                           }else{
                             skip();
                           }
@@ -85,7 +99,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
 
   void skip(){
+    LocalDB.setShownBoarding(true);
     Navigator.pushNamed(context, RoutesName.welcome);
+  }
+
+  void checkIsShown()async{
+    bool isShown=await LocalDB.getShownBoarding();
+    if(isShown){
+      Navigator.pushNamedAndRemoveUntil(context, RoutesName.welcome, (r)=>false);
+      await LocalDB.setShownBoarding(true);
+      return;
+    }
+    loader=false;
+    setState(() {
+
+    });
   }
 }
 
