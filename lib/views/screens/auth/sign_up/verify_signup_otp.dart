@@ -12,14 +12,14 @@ import 'package:kaustubha_medtech/views/widgets/otp_text_field.dart';
 import '../../../../models/connectivity/error_model.dart';
 import '../../../../utils/routes/route_names.dart';
 import '../../../alerts/custom_alerts.dart';
-class VerifySignOTP extends StatefulWidget {
-  const VerifySignOTP({super.key});
+class VerifySignUpOTP extends StatefulWidget {
+  const VerifySignUpOTP({super.key});
 
   @override
-  State<VerifySignOTP> createState() => _VerifySignOTPState();
+  State<VerifySignUpOTP> createState() => _VerifySignUpOTPState();
 }
 
-class _VerifySignOTPState extends State<VerifySignOTP> {
+class _VerifySignUpOTPState extends State<VerifySignUpOTP> {
   GlobalKey<FormState> formKey=GlobalKey<FormState>();
   FocusScopeNode focusNode=FocusScopeNode();
   String verificationId='';
@@ -117,7 +117,7 @@ class _VerifySignOTPState extends State<VerifySignOTP> {
       CustomPopUp.showSnackBar(context, "${email ?? number ?? ""} Registered Successfully", Colors.green);
       LocalDB.setUserLogin(true);
       LocalDB.setUserInfo(message.user ?? UserInfo());
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.main,(r)=>false);
+      Navigator.pushNamedAndRemoveUntil(context,RoutesName.patientMain,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }

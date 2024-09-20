@@ -24,27 +24,47 @@ class RoutesName {
 
 
   ///main
-  static const String main = "main";
+  static const String patientMain = "patientMain";
+  static const String doctorMain = "doctorMain";
 
   ///home
-  static const String home = "home";
+  static const String patientHome = "patientHome";
+  static const String doctorHome = "doctorHome";
 
-  ///appointments
-  static const String appointments = "appointments";
+  ///patientAppointments
+  static const String patientAppointments = "patientAppointments";
   static const String reScheduleAppointment = "re_schedule_appointment";
   static const String addReview = "add_review";
 
+  ///doctorAppointments
+  static const String doctorAppointments = "doctorAppointments";
 
-  ///consult
+  ///doctorCalendar
+  static const String doctorCalendar = "doctorCalendar";
+
+  ///doctorSchedule
+  static const String doctorSchedule = "doctorSchedule";
+
+  ///doctorChat
+  static const String doctorChat = "doctorChat";
+
+  ///patientConsult
   static const String consult = "consult";
-  static const String doctorDetails = "doctor_details";
+  static const String patientDoctorDetails = "patientDoctorDetails";
   static const String bookAppointment = "book_appointment";
+  static const String payment = "payment_screen";
 
-  ///chat
+  ///patientChat
   static const String chat = "chat";
 
-  ///tracker
+  ///patientTracker
   static const String tracker = "tracker";
 
+
+  ///profile
+  static const String profile = "profile";
+  static const String editProfile = "editProfile";
+  static const String verifyUpdateOTP = "verifyUpdateOTP";
+  static const String notifications = "notifications";
 
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names.dart';
 class DontHaveAccountWidget extends StatelessWidget {
   const DontHaveAccountWidget({super.key});
 
@@ -11,7 +12,9 @@ class DontHaveAccountWidget extends StatelessWidget {
         children: [
           Text( "Don't have an account?",style: GoogleFonts.inter(color: Colors.grey)),
           SizedBox(width: 4.w,),
-          Text("Sign up",style: GoogleFonts.inter(fontWeight: FontWeight.bold,decoration: TextDecoration.underline),),
+          InkWell(
+              onTap: ()=>Navigator.pushNamed(context,RoutesName.signUp),
+              child: Text("Sign up",style: GoogleFonts.inter(fontWeight: FontWeight.bold,decoration: TextDecoration.underline),)),
         ]
     );
   }

@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:kaustubha_medtech/controller/firebase/firestore_database.dart';
 import 'package:kaustubha_medtech/controller/repo/authentication/signup_repo.dart';
 import 'package:kaustubha_medtech/models/create_account/UserAccount.dart';
 import 'package:kaustubha_medtech/models/sign_up/SignUpModel.dart';

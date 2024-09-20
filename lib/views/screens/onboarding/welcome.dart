@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/main.dart';
+import 'package:kaustubha_medtech/models/user/user_info.dart';
+import 'package:kaustubha_medtech/utils/constants/constants.dart';
 import 'package:kaustubha_medtech/utils/routes/route_names.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_outline_button.dart';
@@ -64,8 +66,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   void getUserInfo()async{
     bool isLogin=await LocalDB.getUserLogin();
-    if(isLogin){
-      Navigator.pushNamedAndRemoveUntil(context, RoutesName.main, (r)=>false);
+    UserInfo? userInfo=await LocalDB.getUserInfo();
+    if(isLogin && userInfo!=null){
+      if(userInfo.role==Constants.patientRole){
+        Navigator.pushNamedAndRemoveUntil(context, RoutesName.patientMain, (r)=>false);
+      }else {
+        Navigator.pushNamedAndRemoveUntil(
+            context, RoutesName.doctorMain, (r) => false);
+      }
       return;
     }
     loader=false;

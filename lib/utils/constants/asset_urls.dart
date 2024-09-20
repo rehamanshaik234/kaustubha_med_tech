@@ -29,5 +29,6 @@ class AssetUrls{
   static String heartBeat='assets/tracker/heart_beat.png';
   static String temperature='assets/tracker/temperature.png';
   static String stress='assets/tracker/stress.png';
+  static String calories='assets/tracker/calories.png';
 
 }

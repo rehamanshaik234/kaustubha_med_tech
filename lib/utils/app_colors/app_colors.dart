@@ -8,11 +8,17 @@ class AppColors{
   //barchart
   static Color barGraphBlue1= const Color(0xFF0047FF);
   static Color barGraphRed1= const Color(0xFFDD256F);
+ static Color barGraphGreen1 = const Color(0xEF00FF48);
+ static Color green = const Color(0xEFDEF7E5);
+ static Color red = const Color(0xEFFDE8E8);
 
   static Color ratingColor= const Color(0xFFFEB052);
   static Color buttonSecondaryBgColor= const Color(0xFFE5E7EB);
 
   static List<Color> blueColors=[barGraphBlue1.withOpacity(0.5),Colors.white];
   static List<Color> redColors=[barGraphRed1.withOpacity(0.5),Colors.white];
+  static List<Color> greenColors=[barGraphGreen1.withOpacity(0.5),Colors.white];
+
+
 
 }

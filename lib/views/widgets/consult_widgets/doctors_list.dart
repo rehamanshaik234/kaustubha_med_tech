@@ -64,7 +64,7 @@ class _DoctorsListState extends State<DoctorsList> {
       margin: data.length==(index+1)? EdgeInsets.only(bottom: 50.h):EdgeInsets.zero,
       padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: InkWell(
-        onTap: ()=>Navigator.of(context,rootNavigator: true).pushNamed(RoutesName.doctorDetails,arguments: {"doctor_id":data[index].doctorName}),
+        onTap: ()=>Navigator.of(context,rootNavigator: true).pushNamed(RoutesName.patientDoctorDetails,arguments: {"doctor_id":data[index].doctorName}),
         child: Card(
           color: Colors.white,
           child: Padding(

@@ -112,7 +112,7 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
       CustomPopUp.showSnackBar(context, "Login Successfully", Colors.green);
       LocalDB.setUserLogin(true);
       LocalDB.setUserInfo(message.user ?? UserInfo());
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.main,(r)=>false);
+      Navigator.pushNamedAndRemoveUntil(context,RoutesName.patientMain,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }
