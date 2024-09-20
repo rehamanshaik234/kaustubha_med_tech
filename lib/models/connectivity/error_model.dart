@@ -4,11 +4,15 @@ class ResponseMessage{
   String? error;
   String? success;
   UserInfo? user;
-  ResponseMessage({this.success, this.error});
+  String? message;
+  bool? status;
+  ResponseMessage({this.success, this.error,this.message,this.status});
 
   ResponseMessage.fromJson(dynamic json){
     error = json["error"];
     success = json["success"];
+    status = json["status"];
+    message = json["message"];
     if(json['user']!=null) {
       user = UserInfo.fromJson(json["user"]);
     }

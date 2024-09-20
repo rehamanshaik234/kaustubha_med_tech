@@ -39,12 +39,22 @@ class RoutesName {
   static const String consult = "consult";
   static const String doctorDetails = "doctor_details";
   static const String bookAppointment = "book_appointment";
+  static const String payment = "payment_screen";
 
   ///chat
   static const String chat = "chat";
 
   ///tracker
   static const String tracker = "tracker";
+
+
+  ///profile
+  static const String profile = "profile";
+  static const String editProfile = "editProfile";
+  static const String verifyUpdateOTP = "verifyUpdateOTP";
+  static const String notifications = "notifications";
+
+
 
 
 }

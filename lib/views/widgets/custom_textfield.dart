@@ -6,7 +6,7 @@ import 'package:kaustubha_medtech/main.dart';
 class CustomTextField extends StatefulWidget {
   CustomTextField({super.key,required this.hintText,this.isPassword=false,this.inputType=TextInputType.text,
     required this.textEditingController,this.focusNode,this.onEditingCompleted,this.onChange,this.readOnly,
-    this.outlinedBorder,this.includeSpacing,this.border,this.lines,this.outlineColor});
+    this.outlinedBorder,this.includeSpacing,this.border,this.lines=1,this.outlineColor,this.fillColor});
   String hintText;
   bool isPassword;
   TextInputType inputType;
@@ -19,7 +19,8 @@ class CustomTextField extends StatefulWidget {
   bool? includeSpacing;
   Color? outlineColor;
   InputBorder? border;
-  int? lines;
+  int lines;
+  Color? fillColor;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -57,6 +58,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           focusColor: Colors.black,
           hintStyle: GoogleFonts.inter(color: Colors.black54),
           hoverColor: Colors.grey,
+          fillColor: widget.fillColor,
           border: widget.outlinedBorder==true? widget.border ?? OutlineInputBorder(
             borderSide: BorderSide(color:  Colors.black26,width: 2.w),
             borderRadius: BorderRadius.circular(12.sp)

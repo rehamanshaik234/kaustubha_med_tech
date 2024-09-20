@@ -106,6 +106,9 @@ class _CreateAccountState extends State<CreateAccount> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 16.h,),
+                    CustomTextField(
+                      hintText: "Full Name", textEditingController: fullName,includeSpacing: true,),
                     SizedBox(height: 24.h),
                     CustomTextField(hintText: "Number",
                       textEditingController: number,
@@ -126,14 +129,18 @@ class _CreateAccountState extends State<CreateAccount> {
                       onChange: (text) {
                         setState(() {});
                       },),
-                    SizedBox(height: 16.h,),
-                    CustomTextField(
-                        hintText: "Full Name", textEditingController: fullName,includeSpacing: true,),
-                    SizedBox(height: 16.h,),
-                    CustomTextField(hintText: "Password",
-                      isPassword: true,
-                      textEditingController: password,
-                      onChange: (text) => setState(() {}),),
+                    Visibility(
+                      visible: email.text.isNotEmpty,
+                      child: Column(
+                        children: [
+                          SizedBox(height: 16.h,),
+                          CustomTextField(hintText: "Password",
+                            isPassword: true,
+                            textEditingController: password,
+                            onChange: (text) => setState(() {}),),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: 8.h,),
                     agreeWithTermsConditions(),
                     SizedBox(height: 24.h,),
@@ -201,14 +208,18 @@ class _CreateAccountState extends State<CreateAccount> {
 
 
   bool validatePasswords() {
-    if (password.text.isEmpty) {
-      CustomPopUp.showSnackBar(context, "Enter Password", Colors.redAccent);
-      return false;
-    } else if (password.text.length < 6) {
-      CustomPopUp.showSnackBar(
-          context, "Password Must Contains 6 Characters", Colors.redAccent);
-      return false;
-    } else {
+    if(email.text.isNotEmpty) {
+      if (password.text.isEmpty) {
+        CustomPopUp.showSnackBar(context, "Enter Password", Colors.redAccent);
+        return false;
+      } else if (password.text.length < 6) {
+        CustomPopUp.showSnackBar(
+            context, "Password Must Contains 6 Characters", Colors.redAccent);
+        return false;
+      } else {
+        return true;
+      }
+    }else{
       return true;
     }
   }

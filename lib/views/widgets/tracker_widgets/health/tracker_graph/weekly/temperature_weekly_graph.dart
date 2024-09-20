@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kaustubha_medtech/views/widgets/tracker_widgets/tracker_graph/tracker_average_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
-import '../../../../../utils/app_colors/app_colors.dart';
+import '../../../../../../utils/app_colors/app_colors.dart';
+import '../tracker_average_widget.dart';
 
-class TrackerStressDailyGraph extends StatefulWidget {
-  const TrackerStressDailyGraph({super.key});
+class TrackerTemperatureWeeklyGraph extends StatefulWidget {
+  const TrackerTemperatureWeeklyGraph({super.key});
 
   @override
-  State<TrackerStressDailyGraph> createState() => _TrackerStressDailyGraphState();
+  State<TrackerTemperatureWeeklyGraph> createState() => _TrackerTemperatureWeeklyGraphState();
 }
 
-class _TrackerStressDailyGraphState extends State<TrackerStressDailyGraph> {
+class _TrackerTemperatureWeeklyGraphState extends State<TrackerTemperatureWeeklyGraph> {
   @override
   Widget build(BuildContext context) {
     return Consumer<TrackerProvider>(
       builder: (context, provider, child) {
-        List<_ChartData> dailyData = provider.tracker.healthMonitoring?.dailyMonitoring
-            ?.map((data) => _ChartData(data.day ?? '', data.stressLevel ?? 1))
+        // Extract the weekly temperature data from the provider
+        List<_ChartData> weeklyTemperatureData = provider.tracker.healthMonitoring?.weeklyMonitoring
+            ?.map((data) => _ChartData(data.week ?? "", data.temperature ?? 0.0))
             .toList() ??
             [];
 
-        final pulseValues = dailyData.map((data) => data.stress).toList();
+        final pulseValues = weeklyTemperatureData.map((data) => data.temperature).toList();
         final minPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a < b ? a : b) : 0;
         final maxPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a > b ? a : b) : 0;
         final avgPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a + b) / pulseValues.length : 0;
@@ -38,19 +39,18 @@ class _TrackerStressDailyGraphState extends State<TrackerStressDailyGraph> {
                   majorGridLines: const MajorGridLines(width: 0), // Disable vertical grid lines
                 ),
                 primaryYAxis: NumericAxis(
-                  interval: 80, // Set the Y-axis interval to 50
+                  interval: 5, // Set the Y-axis interval to 5 degrees
                   majorGridLines: const MajorGridLines(width: 1), // Enable horizontal grid lines
-                  minimum: 0,  // Start the Y-axis from 0
-                  maximum: 400, // Adjust the maximum based on pulse range
+                  minimum: 80, // Start the Y-axis from 80 degrees
+                  maximum: 105, // Adjust the maximum based on temperature range
                   axisLabelFormatter: (AxisLabelRenderDetails details) {
                     Color labelColor;
+
                     // Custom logic to change label color based on value
-                    if (details.value <= 150) {
+                    if (details.value <= 90) {
+                      labelColor = Colors.blue;
+                    } else if (details.value <= 99) {
                       labelColor = Colors.green;
-                    } else if (details.value <= 200) {
-                      labelColor = Colors.yellow;
-                    } else if (details.value <= 300) {
-                      labelColor = Colors.orange;
                     } else {
                       labelColor = Colors.red;
                     }
@@ -58,18 +58,18 @@ class _TrackerStressDailyGraphState extends State<TrackerStressDailyGraph> {
                     return ChartAxisLabel(
                       details.text,
                       TextStyle(
-                        color: labelColor, // Set the label color based on the value range
+                        color: labelColor, // Set the label color based on the temperature range
                         fontSize: 12.sp,
                       ),
                     );
                   },
                 ),
                 series: <CartesianSeries>[
-                  // Daily Pulse Data
+                  // Weekly Temperature Data
                   SplineAreaSeries<_ChartData, String>(
-                    dataSource: dailyData,
-                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (days)
-                    yValueMapper: (_ChartData data, _) => data.stress, // Y-axis values (pulse)
+                    dataSource: weeklyTemperatureData,
+                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (week days)
+                    yValueMapper: (_ChartData data, _) => data.temperature, // Y-axis values (temperature)
                     gradient: LinearGradient(
                       colors: AppColors.redColors,
                       begin: Alignment.topCenter,
@@ -77,7 +77,7 @@ class _TrackerStressDailyGraphState extends State<TrackerStressDailyGraph> {
                     ),
                     borderColor: AppColors.barGraphRed1,
                     borderWidth: 2,
-                    name: 'Daily Stress',
+                    name: 'Weekly Temperature',
                   ),
                 ],
                 tooltipBehavior: TooltipBehavior(enable: true), // Enable tooltips on hover
@@ -104,8 +104,8 @@ class _TrackerStressDailyGraphState extends State<TrackerStressDailyGraph> {
 
 // Class to hold chart data
 class _ChartData {
-  final String time;
-  final num stress;
+  final String time; // This will be the day of the week
+  final num temperature;
 
-  _ChartData(this.time, this.stress);
+  _ChartData(this.time, this.temperature);
 }

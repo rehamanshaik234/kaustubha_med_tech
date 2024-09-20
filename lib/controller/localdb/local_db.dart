@@ -52,7 +52,7 @@ class LocalDB{
   }
 
 
-  static Future<bool> clear()async{
+  static Future<bool> logout()async{
     SharedPreferences sharedPreferences= await _preferences;
     await sharedPreferences.clear();
     return await setShownBoarding(true);

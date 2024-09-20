@@ -136,7 +136,7 @@ class _BookAppointmentState extends State<BookAppointment> {
       bottomSheet: Padding(
         padding: EdgeInsets.all(16.sp),
         child: CustomButton(onPressed: (){
-          AppointmentAlert.showBookedAppointment(context);
+          Navigator.pushNamed(context, RoutesName.payment);
         }, title: "Confirm",borderRadius: BorderRadius.circular(25.sp),),
       ),
     );

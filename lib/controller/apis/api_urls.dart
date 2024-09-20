@@ -17,4 +17,11 @@ class ApiUrls{
   ///Tracker
   static String patientTracker='/patients/tracker/get';
 
+  ///profile
+  static String userProfile='/profile/get-by-id';
+  static String updateProfile='/profile/update';
+  static String updateSendEmailOTP='/profile/update/send-email-otp';
+  static String updateSendNumberOTP='/profile/update/send-number-otp';
+  static String updateVerifyEmailOTP='/profile/update/verify-email-otp';
+  static String updateVerifyNumberOTP='/profile/update/verify-number-otp';
 }

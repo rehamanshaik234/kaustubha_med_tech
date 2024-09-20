@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
+import 'package:kaustubha_medtech/controller/providers/user/user_provider.dart';
 import 'package:kaustubha_medtech/models/user/user_info.dart';
 import 'package:provider/provider.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/sign_up_provider.dart';
@@ -9,17 +10,17 @@ import 'package:kaustubha_medtech/views/widgets/custom_back_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/otp_text_field.dart';
 
-import '../../../../models/connectivity/error_model.dart';
-import '../../../../utils/routes/route_names.dart';
-import '../../../alerts/custom_alerts.dart';
-class VerifySignUpOTP extends StatefulWidget {
-  const VerifySignUpOTP({super.key});
+import '../../../../../../../models/connectivity/error_model.dart';
+import '../../../../../../../utils/routes/route_names.dart';
+import '../../../../../../alerts/custom_alerts.dart';
+class VerifyUpdateOTP extends StatefulWidget {
+  const VerifyUpdateOTP({super.key});
 
   @override
-  State<VerifySignUpOTP> createState() => _VerifySignUpOTPState();
+  State<VerifyUpdateOTP> createState() => _VerifyUpdateOTPState();
 }
 
-class _VerifySignUpOTPState extends State<VerifySignUpOTP> {
+class _VerifyUpdateOTPState extends State<VerifyUpdateOTP> {
   GlobalKey<FormState> formKey=GlobalKey<FormState>();
   FocusScopeNode focusNode=FocusScopeNode();
   String verificationId='';
@@ -33,6 +34,7 @@ class _VerifySignUpOTPState extends State<VerifySignUpOTP> {
 
   String? email;
   String? number;
+  Map<String,dynamic> params={};
 
 
   @override
@@ -46,7 +48,7 @@ class _VerifySignUpOTPState extends State<VerifySignUpOTP> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Consumer<SignUpProvider>(
+      body: Consumer<UserProvider>(
         builder: (context,provider,child) {
           return Padding(
             padding: EdgeInsets.all(16.sp),
@@ -100,35 +102,44 @@ class _VerifySignUpOTPState extends State<VerifySignUpOTP> {
 
   }
 
-  void registerNumber(SignUpProvider provider,String otp)async{
-    Map<String,dynamic> data=provider.signUpModel.toJson();
+  void verifyNumber(UserProvider provider,String otp)async{
+    Map<String,dynamic> data={UserInfo.userPhoneKey:number?.replaceAll('+91', '')};
     data['otp']=otp;
-    provider.signUpWithNumber(data, onSignUpResponse);
+    provider.verifyNumberOTP(data, onVerifyResponse);
   }
 
-  void verifyEmail(SignUpProvider provider,String otp)async{
+  void verifyEmail(UserProvider provider,String otp)async{
     Map<String,dynamic> data= {'otp':otp,'email':email};
-    provider.verifyEmail(data, onSignUpResponse);
+    provider.verifyEmailOTP(data, onVerifyResponse);
   }
 
+  void editProfile(UserProvider provider){
+    provider.updateProfile(params, onUpdateProfileResponse);
+  }
 
-  void onSignUpResponse(ResponseMessage message) {
-    if (message.user != null || message.success!=null) {
-      CustomPopUp.showSnackBar(context, "${email ?? number ?? ""} Registered Successfully", Colors.green);
-      LocalDB.setUserLogin(true);
-      LocalDB.setUserInfo(message.user ?? UserInfo());
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.main,(r)=>false);
+  void onUpdateProfileResponse(ResponseMessage message)async{
+    if(message.user!=null){
+      Navigator.pop(context);
+      CustomPopUp.showSnackBar(context, message.success ?? 'Updated Successfully', Colors.greenAccent);
+    }else{
+      CustomPopUp.showSnackBar(context, message.message ?? 'Something Went Wrong', Colors.redAccent);
+    }
+  }
+
+  void onVerifyResponse(ResponseMessage message) {
+    if ( message.message!.contains('Verified')) {
+      editProfile(Provider.of<UserProvider>(context,listen: false));
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }
   }
 
- void verifyOTP(SignUpProvider provider)async {
+ void verifyOTP(UserProvider provider)async {
    String otp = otp1.text + otp2.text + otp3.text + otp4.text + otp5.text +
        otp6.text;
    if(otp.length==6) {
      if(number!=null){
-       registerNumber(provider, otp);
+       verifyNumber(provider, otp);
      }else{
        verifyEmail(provider, otp);
      }
@@ -144,6 +155,7 @@ class _VerifySignUpOTPState extends State<VerifySignUpOTP> {
     if(data!=null){
       email=data['email'];
       number=data['number'];
+      params=data['data'] as Map<String,dynamic>;
       setState(() {});
     }
   }

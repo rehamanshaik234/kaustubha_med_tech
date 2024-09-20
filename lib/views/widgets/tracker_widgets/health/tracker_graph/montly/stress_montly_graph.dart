@@ -3,29 +3,28 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
-import '../../../../../utils/app_colors/app_colors.dart';
+
+import '../../../../../../utils/app_colors/app_colors.dart';
 import '../tracker_average_widget.dart';
 
-class TrackerTemperatureDailyGraph extends StatefulWidget {
-  const TrackerTemperatureDailyGraph({super.key});
+class TrackerStressMonthlyGraph extends StatefulWidget {
+  const TrackerStressMonthlyGraph({super.key});
 
   @override
-  State<TrackerTemperatureDailyGraph> createState() => _TrackerTemperatureDailyGraphState();
+  State<TrackerStressMonthlyGraph> createState() => _TrackerStressMonthlyGraphState();
 }
 
-class _TrackerTemperatureDailyGraphState extends State<TrackerTemperatureDailyGraph> {
+class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
   @override
   Widget build(BuildContext context) {
     return Consumer<TrackerProvider>(
       builder: (context, provider, child) {
-        // Extract the daily temperature data from the provider
-        List<_ChartData> dailyTemperatureData = provider.tracker.healthMonitoring?.dailyMonitoring
-            ?.map((data) => _ChartData(data.day ?? "", data.temperature ?? 0.0))
+        // Extract the monthly stress data from the provider
+        List<_ChartData> monthlyData = provider.tracker.healthMonitoring?.monthlyMonitoring
+            ?.map((data) => _ChartData(data.month ?? '', data.stressLevel ?? 1))
             .toList() ??
             [];
-
-        // Calculate min, max, and average values
-        final pulseValues = dailyTemperatureData.map((data) => data.temperature).toList();
+        final pulseValues = monthlyData.map((data) => data.stress).toList();
         final minPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a < b ? a : b) : 0;
         final maxPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a > b ? a : b) : 0;
         final avgPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a + b) / pulseValues.length : 0;
@@ -38,20 +37,24 @@ class _TrackerTemperatureDailyGraphState extends State<TrackerTemperatureDailyGr
                 primaryXAxis: CategoryAxis(
                   labelStyle: TextStyle(fontSize: 8.sp),
                   majorGridLines: const MajorGridLines(width: 0), // Disable vertical grid lines
+                  // Configure the X-axis to handle monthly data (months of the year)
+                  interval: 1, // Adjust the interval as needed
                 ),
                 primaryYAxis: NumericAxis(
-                  interval: 5, // Set the Y-axis interval to 5 degrees
+                  interval: 80, // Set the Y-axis interval to 80 units
                   majorGridLines: const MajorGridLines(width: 1), // Enable horizontal grid lines
-                  minimum: 80, // Start the Y-axis from 60 degrees
-                  maximum: 105, // Adjust the maximum based on temperature range
+                  minimum: 0,  // Start the Y-axis from 0
+                  maximum: 400, // Adjust the maximum based on stress range
                   axisLabelFormatter: (AxisLabelRenderDetails details) {
                     Color labelColor;
 
                     // Custom logic to change label color based on value
-                    if (details.value <= 90) {
-                      labelColor = Colors.blue;
-                    } else if (details.value <= 99) {
+                    if (details.value <= 150) {
                       labelColor = Colors.green;
+                    } else if (details.value <= 200) {
+                      labelColor = Colors.yellow;
+                    } else if (details.value <= 300) {
+                      labelColor = Colors.orange;
                     } else {
                       labelColor = Colors.red;
                     }
@@ -59,18 +62,18 @@ class _TrackerTemperatureDailyGraphState extends State<TrackerTemperatureDailyGr
                     return ChartAxisLabel(
                       details.text,
                       TextStyle(
-                        color: labelColor, // Set the label color based on the temperature range
+                        color: labelColor, // Set the label color based on the value range
                         fontSize: 12.sp,
                       ),
                     );
                   },
                 ),
                 series: <CartesianSeries>[
-                  // Daily Temperature Data
+                  // Monthly Stress Data
                   SplineAreaSeries<_ChartData, String>(
-                    dataSource: dailyTemperatureData,
-                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (days)
-                    yValueMapper: (_ChartData data, _) => data.temperature, // Y-axis values (temperature)
+                    dataSource: monthlyData,
+                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (months of the year)
+                    yValueMapper: (_ChartData data, _) => data.stress, // Y-axis values (stress levels)
                     gradient: LinearGradient(
                       colors: AppColors.redColors,
                       begin: Alignment.topCenter,
@@ -78,7 +81,7 @@ class _TrackerTemperatureDailyGraphState extends State<TrackerTemperatureDailyGr
                     ),
                     borderColor: AppColors.barGraphRed1,
                     borderWidth: 2,
-                    name: 'Daily Temperature',
+                    name: 'Monthly Stress',
                   ),
                 ],
                 tooltipBehavior: TooltipBehavior(enable: true), // Enable tooltips on hover
@@ -105,8 +108,8 @@ class _TrackerTemperatureDailyGraphState extends State<TrackerTemperatureDailyGr
 
 // Class to hold chart data
 class _ChartData {
-  final String time; // This will be the day of the week
-  final num temperature;
+  final String time; // This will be the month of the year
+  final num stress; // This will be the stress level
 
-  _ChartData(this.time, this.temperature);
+  _ChartData(this.time, this.stress);
 }
