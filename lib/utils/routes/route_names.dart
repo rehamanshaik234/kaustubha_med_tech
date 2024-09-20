@@ -47,4 +47,12 @@ class RoutesName {
   static const String tracker = "tracker";
 
 
+  ///profile
+  static const String profile = "profile";
+  static const String editProfile = "editProfile";
+  static const String notifications = "notifications";
+
+
+
+
 }

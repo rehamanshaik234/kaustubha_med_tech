@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:kaustubha_medtech/controller/firebase/firebase_auth.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/sign_up_provider.dart';
 import 'package:kaustubha_medtech/views/alerts/custom_alerts.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_back_button.dart';

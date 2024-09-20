@@ -31,7 +31,7 @@ class TrackerProvider extends ChangeNotifier{
     _error='';
     notifyListeners();
     UserInfo? userid=await LocalDB.getUserInfo();
-    Map<String,dynamic> params= { UserInfo.userIdKey :'cm17poi7w0000ezs4a5h6awyx'} ;
+    Map<String,dynamic> params= { UserInfo.userIdKey :userid?.id} ;
     ApiResponse apiResponse = await trackerRepo.getPatientTracker(params);
     print("apiResponse.Data.success ${apiResponse.response?.data.toString()}");
     if( apiResponse.response != null && apiResponse.response?.statusCode == 200 ){

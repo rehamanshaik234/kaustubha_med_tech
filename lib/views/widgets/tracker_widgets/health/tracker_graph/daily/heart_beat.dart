@@ -1,30 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
-import '../../../../../utils/app_colors/app_colors.dart';
+import '../../../../../../utils/app_colors/app_colors.dart';
 import '../tracker_average_widget.dart';
 
-class TrackerHeartBeatWeeklyGraph extends StatefulWidget {
-  const TrackerHeartBeatWeeklyGraph({super.key});
+class TrackerHeartBeatDailyGraph extends StatefulWidget {
+  const TrackerHeartBeatDailyGraph({super.key});
 
   @override
-  State<TrackerHeartBeatWeeklyGraph> createState() => _TrackerHeartBeatWeeklyGraphState();
+  State<TrackerHeartBeatDailyGraph> createState() => _TrackerHeartBeatDailyGraphState();
 }
 
-class _TrackerHeartBeatWeeklyGraphState extends State<TrackerHeartBeatWeeklyGraph> {
+class _TrackerHeartBeatDailyGraphState extends State<TrackerHeartBeatDailyGraph> {
   @override
   Widget build(BuildContext context) {
     return Consumer<TrackerProvider>(
       builder: (context, provider, child) {
-        // Extract the weekly pulse data from the provider
-        // Assuming weeklyMonitoring is an available list similar to dailyMonitoring
-        List<_ChartData> weeklyData = provider.tracker.healthMonitoring?.weeklyMonitoring
-            ?.map((data) => _ChartData(data.week ?? "", data.pulse ?? 1))
+        // Extract the daily pulse data from the provider
+        List<_ChartData> dailyData = provider.tracker.healthMonitoring?.dailyMonitoring
+            ?.map((data) => _ChartData(data.day ?? "", data.pulse ?? 1))
             .toList() ??
             [];
-        final pulseValues = weeklyData.map((data) => data.pulse).toList();
+        // Calculate min, max, and average values
+        final pulseValues = dailyData.map((data) => data.pulse).toList();
         final minPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a < b ? a : b) : 0;
         final maxPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a > b ? a : b) : 0;
         final avgPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a + b) / pulseValues.length : 0;
@@ -35,7 +36,7 @@ class _TrackerHeartBeatWeeklyGraphState extends State<TrackerHeartBeatWeeklyGrap
               height: 250.h,
               child: SfCartesianChart(
                 primaryXAxis: CategoryAxis(
-                  labelStyle: TextStyle(fontSize: 12.sp),
+                  labelStyle: TextStyle(fontSize: 8.sp),
                   majorGridLines: const MajorGridLines(width: 0), // Disable vertical grid lines
                 ),
                 primaryYAxis: NumericAxis(
@@ -45,7 +46,6 @@ class _TrackerHeartBeatWeeklyGraphState extends State<TrackerHeartBeatWeeklyGrap
                   maximum: 250, // Adjust the maximum based on pulse range
                   axisLabelFormatter: (AxisLabelRenderDetails details) {
                     Color labelColor;
-
                     // Custom logic to change label color based on value
                     if (details.value <= 100) {
                       labelColor = Colors.green;
@@ -67,10 +67,10 @@ class _TrackerHeartBeatWeeklyGraphState extends State<TrackerHeartBeatWeeklyGrap
                   },
                 ),
                 series: <CartesianSeries>[
-                  // Weekly Pulse Data
+                  // Daily Pulse Data
                   SplineAreaSeries<_ChartData, String>(
-                    dataSource: weeklyData,
-                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (week numbers or week names)
+                    dataSource: dailyData,
+                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (days)
                     yValueMapper: (_ChartData data, _) => data.pulse, // Y-axis values (pulse)
                     gradient: LinearGradient(
                       colors: AppColors.blueColors,
@@ -79,7 +79,7 @@ class _TrackerHeartBeatWeeklyGraphState extends State<TrackerHeartBeatWeeklyGrap
                     ),
                     borderColor: AppColors.barGraphBlue1,
                     borderWidth: 2,
-                    name: 'Weekly Pulse',
+                    name: 'Daily Pulse',
                   ),
                 ],
                 tooltipBehavior: TooltipBehavior(enable: true), // Enable tooltips on hover
@@ -102,11 +102,12 @@ class _TrackerHeartBeatWeeklyGraphState extends State<TrackerHeartBeatWeeklyGrap
       },
     );
   }
+
 }
 
 // Class to hold chart data
 class _ChartData {
-  final String time; // This could be the week number or a week label
+  final String time;
   final num pulse;
 
   _ChartData(this.time, this.pulse);

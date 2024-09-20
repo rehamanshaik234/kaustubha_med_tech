@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/utils/constants/asset_urls.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_appbar.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
-import 'package:kaustubha_medtech/views/widgets/home_widgets/chart.dart';
+import 'package:kaustubha_medtech/views/widgets/home_widgets/hb_temp_graphs/daily_graph.dart';
+import 'package:kaustubha_medtech/views/widgets/home_widgets/hb_temp_graphs/monthly_graph.dart';
+import 'package:kaustubha_medtech/views/widgets/home_widgets/hb_temp_graphs/weekly_graph.dart';
 import 'package:kaustubha_medtech/views/widgets/home_widgets/pregnancy_fitness_overview.dart';
 import 'package:kaustubha_medtech/views/widgets/home_widgets/recommended_communities.dart';
 import 'package:kaustubha_medtech/views/widgets/home_widgets/recommended_doctors.dart';
@@ -21,10 +24,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int selectedGraph=1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar.appBar(),
+      appBar: CustomAppbar.appBar(context),
       body: Padding(
         padding: EdgeInsets.only(left: 12.0.w,right: 12.w),
         child: SingleChildScrollView(
@@ -60,11 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 12.h,
                       ),
                       CustomSlidingSegmentedControl<int>(
-                        initialValue: 2,
+                        initialValue: 1,
                         children:  {
-                          1: SizedBox(width:1.sw*0.215, child: Center(child: Text('Today',style: GoogleFonts.dmSans(fontWeight: FontWeight.w500,fontSize: 14.sp),)),),
-                          2: SizedBox(width:1.sw*0.215, child: Center(child: Text('Monthly',style: GoogleFonts.dmSans(fontWeight: FontWeight.w500,fontSize: 14.sp),)),),
-                          3: SizedBox(width:1.sw*0.215, child: Center(child: Text('Yearly',style: GoogleFonts.dmSans(fontWeight: FontWeight.w500,fontSize: 14.sp),)),),
+                          1: SizedBox(width:1.sw*0.215, child: Center(child: Text('Daily',style: GoogleFonts.dmSans(fontWeight: FontWeight.w500,fontSize: 14.sp),)),),
+                          2: SizedBox(width:1.sw*0.215, child: Center(child: Text('Weekly',style: GoogleFonts.dmSans(fontWeight: FontWeight.w500,fontSize: 14.sp),)),),
+                          3: SizedBox(width:1.sw*0.215, child: Center(child: Text('Monthly',style: GoogleFonts.dmSans(fontWeight: FontWeight.w500,fontSize: 14.sp),)),),
                         },
                         decoration: BoxDecoration(
                           color: CupertinoColors.lightBackgroundGray,
@@ -88,81 +92,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInToLinear,
                         onValueChanged: (v) {
-                          print(v);
+                          selectedGraph=v ;
+                          setState(() {});
                         },
                       ),
                       SizedBox(
                         height: 12.h,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(width: 4.w,),
-                          CircleAvatar(
-                             radius: 20.sp,
-                              backgroundColor: CupertinoColors.lightBackgroundGray,
-                              child: Center(child: Icon(CupertinoIcons.heart,size: 25.sp,color: Colors.black87,))),
-                          SizedBox(width: 8.w,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-          
-                            children: [
-                              Text("Heart Rate",style: GoogleFonts.dmSans(color: Colors.black54),),
-                              Text("72 BPM",style: GoogleFonts.dmSans(color: Colors.black,fontWeight: FontWeight.w500,fontSize: 16.sp),)
-                            ],
-                          )
-                        ],
-                      ),
+                      graphBySelectedType(),
                       SizedBox(height: 12.h,),
-                      SplineAreaChart(),
-                      SizedBox(height: 12.h,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 4.w,),
-                                CircleAvatar(
-                                    radius: 20.sp,
-                                    backgroundColor: CupertinoColors.lightBackgroundGray,
-                                    child: Center(child: Icon(Icons.note_alt_outlined,size: 25.sp,color: Colors.black87,))),
-                                SizedBox(width: 8.w,),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Weight",style: GoogleFonts.dmSans(color: Colors.black54),),
-                                    Text("75 Kilograms",style: GoogleFonts.dmSans(color: Colors.black,fontWeight: FontWeight.w500,fontSize: 16.sp),)
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 4.w,),
-                                CircleAvatar(
-                                    radius: 20.sp,
-                                    backgroundColor: CupertinoColors.lightBackgroundGray,
-                                    child: Center(child: Icon(CupertinoIcons.thermometer,size: 25.sp,color: Colors.black87,))),
-                                SizedBox(width: 8.w,),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Temperature",style: GoogleFonts.dmSans(color: Colors.black54),),
-                                    Text("37°C",style: GoogleFonts.dmSans(color: Colors.black,fontWeight: FontWeight.w500,fontSize: 16.sp),)
-                                  ],
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 12.h,),
-                      CustomButton(onPressed: (){}, title: "See More",borderRadius: BorderRadius.circular(20.sp),padding: 0,),
+                      CustomButton(onPressed: ()=>Navigator.pushNamed(context,RoutesName.tracker), title: "See More",borderRadius: BorderRadius.circular(20.sp),padding: 0,),
                     ],
                   ),
                 ),
@@ -210,5 +149,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  Widget graphBySelectedType(){
+    if(selectedGraph==1){
+      return HeartBeatTemperatureDailyGraph();
+    }else if(selectedGraph==2){
+      return HeartBeatTemperatureWeeklyGraph();
+    }else{
+      return HeartBeatTemperatureMonthlyGraph();
+    }
   }
 }

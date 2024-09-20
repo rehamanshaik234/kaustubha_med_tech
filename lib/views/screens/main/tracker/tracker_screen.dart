@@ -5,9 +5,12 @@ import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
 import 'package:kaustubha_medtech/main.dart';
 import 'package:kaustubha_medtech/models/connectivity/error_model.dart';
 import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
-import 'package:kaustubha_medtech/views/widgets/tracker_widgets/tracker_graph_view.dart';
-import 'package:kaustubha_medtech/views/widgets/tracker_widgets/tracker_tab.dart';
-import 'package:kaustubha_medtech/views/widgets/tracker_widgets/tracker_options.dart';
+import 'package:kaustubha_medtech/views/widgets/tracker_widgets/activity/health_activity.dart';
+import 'package:kaustubha_medtech/views/widgets/tracker_widgets/health/tracker_graph_view.dart';
+import 'package:kaustubha_medtech/views/widgets/tracker_widgets/health/tracker_dropdown.dart';
+import 'package:kaustubha_medtech/views/widgets/tracker_widgets/health/tracker_options.dart';
+import 'package:kaustubha_medtech/views/widgets/tracker_widgets/health/tracker_tab_bar.dart';
+import 'package:kaustubha_medtech/views/widgets/tracker_widgets/reports/health_report.dart';
 import 'package:provider/provider.dart';
 
 import '../../../widgets/custom_appbar.dart';
@@ -19,24 +22,36 @@ class TrackerScreen extends StatefulWidget {
   State<TrackerScreen> createState() => _TrackerScreenState();
 }
 
-class _TrackerScreenState extends State<TrackerScreen> {
+class _TrackerScreenState extends State<TrackerScreen> with SingleTickerProviderStateMixin {
 
   TrackerOption selectedOption=TrackerOption.pulse;
+  late TabController tabController;
+  int selectedTab=1;
 
 @override
   void initState() {
+   tabController=TabController(length: 3, vsync: this);
    WidgetsBinding.instance.addPostFrameCallback((_){
      getTrackerInfo();
+     tabController.addListener(onChangeTab);
    });
    // TODO: implement initState
     super.initState();
   }
 
+  @override
+  void dispose() {
+    tabController.removeListener(onChangeTab);
+    // TODO: implement dispose
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      appBar: CustomAppbar.appBar(),
+      appBar: CustomAppbar.appBar(
+          context,
+          bottom: PreferredSize(preferredSize: Size(1.sw, 40.h), child: TrackerTabBar(tabController: tabController,))),
       body: Consumer<TrackerProvider>(
           builder: (context,provider,child){
             if(provider.loader){
@@ -45,20 +60,22 @@ class _TrackerScreenState extends State<TrackerScreen> {
             if(provider.errorMessage.isNotEmpty){
               return Center(child: Text(provider.errorMessage,style: GoogleFonts.dmSans(color: Colors.black54,fontSize: 16.sp),),);
             }
-            return Column(
-              children: [
-                SizedBox(height: 16.h,),
-                TrackerOptions(selectedOption: selectedOption,onChange: (option){selectedOption=option;setState(() {});},),
-                SizedBox(height: 24.h,),
-                TrackerGraphView(trackerOption: selectedOption,)
-              ],
+            return TabBarView(controller: tabController,
+                children: [
+                          health(),
+                          HealthActivity(),
+                          HealthReport()
+                     ]
             );
           }),
     );
   }
 
   void getTrackerInfo()async{
-    await Provider.of<TrackerProvider>(context,listen: false).getPatientTracker(onResponse);
+     TrackerProvider provider=Provider.of<TrackerProvider>(context,listen: false);
+     if(provider.tracker.overview==null) {
+       await provider.getPatientTracker(onResponse);
+     }
   }
 
   void onResponse(ResponseMessage message) {
@@ -67,5 +84,18 @@ class _TrackerScreenState extends State<TrackerScreen> {
        }
   }
 
+  Widget health(){
+    return Column(
+      children: [
+        SizedBox(height: 16.h,),
+        TrackerOptions(selectedOption: selectedOption,onChange: (option){selectedOption=option;setState(() {selectedTab=1;});},),
+        SizedBox(height: 24.h,),
+        TrackerHealthGraphView(trackerOption: selectedOption,selectedTab:selectedTab,)
+      ],
+    );
+  }
 
+  void onChangeTab(){
+     setState(() {});
+  }
 }

@@ -19,12 +19,13 @@ class TrackerOptions extends StatelessWidget {
           optionsCard("Heart Beat", TrackerOption.pulse,AssetUrls.heartBeat,EdgeInsets.only(right: 8.w,left: 8.w)),
           optionsCard("Temperature", TrackerOption.temperature,AssetUrls.temperature,EdgeInsets.only(right: 8.w)),
           optionsCard("Stress", TrackerOption.stress,AssetUrls.stress,EdgeInsets.only(right: 8.w)),
+          optionsCard("Calories Burn", TrackerOption.caloriesBurn,AssetUrls.calories,EdgeInsets.only(right: 8.w),imageHeight: 30.h),
         ],
       ),
     );
   }
 
-  Widget optionsCard(String title,TrackerOption option,String assetUrl,EdgeInsets margin){
+  Widget optionsCard(String title,TrackerOption option,String assetUrl,EdgeInsets margin,{double? imageHeight=null}){
     return InkWell(
       onTap: (){
         onChange(option);
@@ -39,7 +40,7 @@ class TrackerOptions extends StatelessWidget {
         margin: margin,
         child: Row(
           children: [
-            Image(image: AssetImage(assetUrl)),
+            Image(image: AssetImage(assetUrl),height: imageHeight,),
             SizedBox(width: 8.w,),
             Text(title,style: GoogleFonts.dmSans(color: Colors.black87,fontSize: 16.sp,),),
           ],

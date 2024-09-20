@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kaustubha_medtech/views/widgets/tracker_widgets/tracker_graph/tracker_average_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
-import '../../../../../utils/app_colors/app_colors.dart';
+import '../../../../../../utils/app_colors/app_colors.dart';
+import '../tracker_average_widget.dart';
 
-class TrackerStressMonthlyGraph extends StatefulWidget {
-  const TrackerStressMonthlyGraph({super.key});
+class TrackerStressDailyGraph extends StatefulWidget {
+  const TrackerStressDailyGraph({super.key});
 
   @override
-  State<TrackerStressMonthlyGraph> createState() => _TrackerStressMonthlyGraphState();
+  State<TrackerStressDailyGraph> createState() => _TrackerStressDailyGraphState();
 }
 
-class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
+class _TrackerStressDailyGraphState extends State<TrackerStressDailyGraph> {
   @override
   Widget build(BuildContext context) {
     return Consumer<TrackerProvider>(
       builder: (context, provider, child) {
-        // Extract the monthly stress data from the provider
-        List<_ChartData> monthlyData = provider.tracker.healthMonitoring?.monthlyMonitoring
-            ?.map((data) => _ChartData(data.month ?? '', data.stressLevel ?? 1))
+        List<_ChartData> dailyData = provider.tracker.healthMonitoring?.dailyMonitoring
+            ?.map((data) => _ChartData(data.day ?? '', data.stressLevel ?? 1))
             .toList() ??
             [];
-        final pulseValues = monthlyData.map((data) => data.stress).toList();
+
+        final pulseValues = dailyData.map((data) => data.stress).toList();
         final minPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a < b ? a : b) : 0;
         final maxPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a > b ? a : b) : 0;
         final avgPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a + b) / pulseValues.length : 0;
@@ -34,19 +34,16 @@ class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
               height: 250.h,
               child: SfCartesianChart(
                 primaryXAxis: CategoryAxis(
-                  labelStyle: TextStyle(fontSize: 12.sp),
+                  labelStyle: TextStyle(fontSize: 8.sp),
                   majorGridLines: const MajorGridLines(width: 0), // Disable vertical grid lines
-                  // Configure the X-axis to handle monthly data (months of the year)
-                  interval: 1, // Adjust the interval as needed
                 ),
                 primaryYAxis: NumericAxis(
-                  interval: 80, // Set the Y-axis interval to 80 units
+                  interval: 80, // Set the Y-axis interval to 50
                   majorGridLines: const MajorGridLines(width: 1), // Enable horizontal grid lines
                   minimum: 0,  // Start the Y-axis from 0
-                  maximum: 400, // Adjust the maximum based on stress range
+                  maximum: 400, // Adjust the maximum based on pulse range
                   axisLabelFormatter: (AxisLabelRenderDetails details) {
                     Color labelColor;
-
                     // Custom logic to change label color based on value
                     if (details.value <= 150) {
                       labelColor = Colors.green;
@@ -68,11 +65,11 @@ class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
                   },
                 ),
                 series: <CartesianSeries>[
-                  // Monthly Stress Data
+                  // Daily Pulse Data
                   SplineAreaSeries<_ChartData, String>(
-                    dataSource: monthlyData,
-                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (months of the year)
-                    yValueMapper: (_ChartData data, _) => data.stress, // Y-axis values (stress levels)
+                    dataSource: dailyData,
+                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (days)
+                    yValueMapper: (_ChartData data, _) => data.stress, // Y-axis values (pulse)
                     gradient: LinearGradient(
                       colors: AppColors.redColors,
                       begin: Alignment.topCenter,
@@ -80,7 +77,7 @@ class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
                     ),
                     borderColor: AppColors.barGraphRed1,
                     borderWidth: 2,
-                    name: 'Monthly Stress',
+                    name: 'Daily Stress',
                   ),
                 ],
                 tooltipBehavior: TooltipBehavior(enable: true), // Enable tooltips on hover
@@ -107,8 +104,8 @@ class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
 
 // Class to hold chart data
 class _ChartData {
-  final String time; // This will be the month of the year
-  final num stress; // This will be the stress level
+  final String time;
+  final num stress;
 
   _ChartData(this.time, this.stress);
 }

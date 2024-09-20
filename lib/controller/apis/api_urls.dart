@@ -17,4 +17,8 @@ class ApiUrls{
   ///Tracker
   static String patientTracker='/patients/tracker/get';
 
+  ///profile
+  static String userProfile='/profile/get-by-id';
+  static String updateProfile='/profile/update';
+
 }

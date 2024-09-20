@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/login_provider.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
+import 'package:kaustubha_medtech/controller/providers/user/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/sign_up_provider.dart';
 import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
@@ -17,6 +18,7 @@ void main()async{
     ChangeNotifierProvider(create: (context)=>SignUpProvider()),
     ChangeNotifierProvider(create: (context)=>LoginProvider()),
     ChangeNotifierProvider(create: (context)=>TrackerProvider()),
+    ChangeNotifierProvider(create: (context)=>UserProvider()),
     ],
     child: const MyApp(),));
 }
