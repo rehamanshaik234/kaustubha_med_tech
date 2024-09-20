@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kaustubha_medtech/views/widgets/tracker_widgets/tracker_graph/tracker_average_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
-import '../../../../../utils/app_colors/app_colors.dart';
+import '../../../../../../utils/app_colors/app_colors.dart';
+import '../tracker_average_widget.dart';
 
-class TrackerStressMonthlyGraph extends StatefulWidget {
-  const TrackerStressMonthlyGraph({super.key});
+class TrackerStressWeeklyGraph extends StatefulWidget {
+  const TrackerStressWeeklyGraph({super.key});
 
   @override
-  State<TrackerStressMonthlyGraph> createState() => _TrackerStressMonthlyGraphState();
+  State<TrackerStressWeeklyGraph> createState() => _TrackerStressWeeklyGraphState();
 }
 
-class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
+class _TrackerStressWeeklyGraphState extends State<TrackerStressWeeklyGraph> {
   @override
   Widget build(BuildContext context) {
     return Consumer<TrackerProvider>(
       builder: (context, provider, child) {
-        // Extract the monthly stress data from the provider
-        List<_ChartData> monthlyData = provider.tracker.healthMonitoring?.monthlyMonitoring
-            ?.map((data) => _ChartData(data.month ?? '', data.stressLevel ?? 1))
+        // Extract the weekly stress data from the provider
+        List<_ChartData> weeklyData = provider.tracker.healthMonitoring?.weeklyMonitoring
+            ?.map((data) => _ChartData(data.week ?? '', data.stressLevel ?? 1))
             .toList() ??
             [];
-        final pulseValues = monthlyData.map((data) => data.stress).toList();
+
+        final pulseValues = weeklyData.map((data) => data.stress).toList();
         final minPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a < b ? a : b) : 0;
         final maxPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a > b ? a : b) : 0;
         final avgPulse = pulseValues.isNotEmpty ? pulseValues.reduce((a, b) => a + b) / pulseValues.length : 0;
@@ -36,7 +37,7 @@ class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
                 primaryXAxis: CategoryAxis(
                   labelStyle: TextStyle(fontSize: 12.sp),
                   majorGridLines: const MajorGridLines(width: 0), // Disable vertical grid lines
-                  // Configure the X-axis to handle monthly data (months of the year)
+                  // Configure the X-axis to handle weekly data (days of the week)
                   interval: 1, // Adjust the interval as needed
                 ),
                 primaryYAxis: NumericAxis(
@@ -68,10 +69,10 @@ class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
                   },
                 ),
                 series: <CartesianSeries>[
-                  // Monthly Stress Data
+                  // Weekly Stress Data
                   SplineAreaSeries<_ChartData, String>(
-                    dataSource: monthlyData,
-                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (months of the year)
+                    dataSource: weeklyData,
+                    xValueMapper: (_ChartData data, _) => data.time, // X-axis labels (days of the week)
                     yValueMapper: (_ChartData data, _) => data.stress, // Y-axis values (stress levels)
                     gradient: LinearGradient(
                       colors: AppColors.redColors,
@@ -80,7 +81,7 @@ class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
                     ),
                     borderColor: AppColors.barGraphRed1,
                     borderWidth: 2,
-                    name: 'Monthly Stress',
+                    name: 'Weekly Stress',
                   ),
                 ],
                 tooltipBehavior: TooltipBehavior(enable: true), // Enable tooltips on hover
@@ -107,7 +108,7 @@ class _TrackerStressMonthlyGraphState extends State<TrackerStressMonthlyGraph> {
 
 // Class to hold chart data
 class _ChartData {
-  final String time; // This will be the month of the year
+  final String time; // This will be the day of the week
   final num stress; // This will be the stress level
 
   _ChartData(this.time, this.stress);

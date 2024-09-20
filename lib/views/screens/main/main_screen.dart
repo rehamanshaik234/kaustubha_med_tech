@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
+import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
 import 'package:kaustubha_medtech/models/user/user_info.dart';
 import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
 import 'package:kaustubha_medtech/utils/constants/asset_urls.dart';
@@ -71,6 +72,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void getUserInfo()async{
     UserInfo? userInfo=await LocalDB.getUserInfo();
+    await Provider.of<TrackerProvider>(context,listen: false).getPatientTracker((response){});
     print(userInfo?.id);
     loader=false;
     setState(() {

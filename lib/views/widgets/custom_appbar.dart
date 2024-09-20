@@ -5,8 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../utils/app_colors/app_colors.dart';
 import '../../utils/constants/asset_urls.dart';
 class CustomAppbar {
-
-  static AppBar appBar(){
+  static AppBar appBar({PreferredSize? bottom}){
     return AppBar(
       backgroundColor: AppColors.scaffoldBgColor,
       leading: Padding(
@@ -24,6 +23,7 @@ class CustomAppbar {
       actions: [
         IconButton(onPressed: (){}, icon: Icon(Icons.search,color: Colors.grey,size: 24.sp,)),
       ],
+      bottom: bottom,
     );
   }
 }
