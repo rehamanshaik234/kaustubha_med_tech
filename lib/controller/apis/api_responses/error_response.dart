@@ -25,8 +25,10 @@ class ApiErrorHandler {
               break;
             case DioExceptionType.badResponse:
               switch (error.response?.statusCode) {
+                case 401:
+                  errorDescription=error.response?.data['error'];
                 case 404:
-                case 500:
+                  errorDescription=error.response?.data['error'];
                 case 503:
                   errorDescription = error.response?.statusMessage;
                   break;

@@ -66,7 +66,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     PaymentFields(title: "Name", hint: "Enter Name", textEditingController: TextEditingController()),
                     SizedBox(height: 16.h,),
                     CustomButton(onPressed: (){
-                      AppointmentAlert.showBookedAppointment(context);
                     }, title: "Pay Now"),
                     SizedBox(height: 16.h,),
                   ],

@@ -51,7 +51,7 @@ class _CustomPatientBottomNavBarState extends State<CustomPatientBottomNavBar> {
                   _buildCustomTab(RoutesName.tracker, "Tracker",Icons.watch_later),
                   _buildCustomTab(RoutesName.consult, "Consult",CupertinoIcons.person_crop_rectangle_fill),
                   _buildCustomTab(RoutesName.patientAppointments, "Appointment",Icons.medical_services),
-                  _buildCustomTab(RoutesName.chat, "Chat",Icons.chat),
+                  _buildCustomTab(RoutesName.contactList, "Chat",Icons.chat),
                 ],
               ),
             ),

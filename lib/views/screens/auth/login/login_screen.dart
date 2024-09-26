@@ -142,13 +142,12 @@ class _LoginScreenState extends State<LoginScreen> {
     if (message.success != null) {
       CustomPopUp.showSnackBar(context, "${message.success}", Colors.greenAccent);
       LocalDB.setUserLogin(true);
-      LocalDB.setUserInfo(message.user ?? UserInfo());
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.patientMain,(r)=>false);
+      LocalDB.setUserInfo( UserInfo.fromJson(message.user));
+      Navigator.pushNamedAndRemoveUntil(context,UserInfo.fromJson(message.user).role==Constants.patientRole? RoutesName.patientMain:RoutesName.doctorMain,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }
   }
-
 
   bool validateEmail(){
     if (emailOrNumber.text.isEmpty) {

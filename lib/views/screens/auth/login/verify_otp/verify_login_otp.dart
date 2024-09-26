@@ -73,7 +73,7 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
                           OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp3,),
                           OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp4,),
                           OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp5,),
-                          OtpTextField(nextFocus:()=> verifyOTP(provider),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp6,),
+                          OtpTextField(nextFocus:(){},prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp6,),
                         ],
                       ),
                       SizedBox(
@@ -111,7 +111,7 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
     if (message.success != null) {
       CustomPopUp.showSnackBar(context, "Login Successfully", Colors.green);
       LocalDB.setUserLogin(true);
-      LocalDB.setUserInfo(message.user ?? UserInfo());
+      LocalDB.setUserInfo(UserInfo.fromJson(message.user));
       Navigator.pushNamedAndRemoveUntil(context,RoutesName.patientMain,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);

@@ -69,7 +69,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       bottomSheet: Padding(
         padding: EdgeInsets.all(16.sp),
         child: CustomButton(onPressed: (){
-          Navigator.pushNamed(context, RoutesName.bookAppointment);
+          Navigator.pushNamed(context, RoutesName.appointmentTimeSlot);
         }, title: "Book Appointment",borderRadius: BorderRadius.circular(25.sp),),
       ),
     );

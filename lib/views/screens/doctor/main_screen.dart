@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
 import 'package:kaustubha_medtech/controller/providers/user/user_provider.dart';
+import 'package:kaustubha_medtech/models/user/EnrollmentStatusModel.dart';
 import 'package:kaustubha_medtech/models/user/user_info.dart';
 import 'package:kaustubha_medtech/utils/routes/doctor_routes.dart';
 import 'package:kaustubha_medtech/utils/routes/route_observer.dart';
 import 'package:kaustubha_medtech/views/widgets/doctor/doctor_custom_navigation_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kaustubha_medtech/utils/routes/route_names.dart';
-import '../../../controller/providers/authentication/sign_up_provider.dart';
-import '../../../utils/routes/routes.dart';
-import '../../widgets/patient_custom_navigation_bar.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class DoctorMainScreen extends StatefulWidget {
   const DoctorMainScreen({super.key});
@@ -23,6 +22,7 @@ class _DoctorMainScreenState extends State<DoctorMainScreen> {
   bool loader=true;
   String currentRoute=RoutesName.patientHome;
   GlobalKey<NavigatorState> navKey=GlobalKey<NavigatorState>();
+  IO.Socket? userSocket;
 
   @override
   void initState() {
@@ -31,6 +31,13 @@ class _DoctorMainScreenState extends State<DoctorMainScreen> {
     });
     // TODO: implement initState
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    userSocket?.disconnect();
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
@@ -44,7 +51,7 @@ class _DoctorMainScreenState extends State<DoctorMainScreen> {
       },
       child: Scaffold(
         body:loader?
-        const Center(child: CircularProgressIndicator(color: Colors.black,),) :
+        const Center(child: CircularProgressIndicator.adaptive(backgroundColor: Colors.black,),) :
         Navigator(
           key: navKey,
           observers: [routeObserver],
@@ -68,20 +75,46 @@ class _DoctorMainScreenState extends State<DoctorMainScreen> {
   void getUserInfo()async{
     UserInfo? userInfo=await LocalDB.getUserInfo();
     await Provider.of<UserProvider>(context,listen: false).getUserInfo((response){});
-    loader=false;
-    setState(() {
+    await Provider.of<UserProvider>(context,listen: false).getDoctorEnrollmentStatus((r){
+      if(r.success!=null&& r.data!=null){
+        EnrollmentStatusModel statusModel=EnrollmentStatusModel.fromJson(r.data);
+        if(statusModel.profile!=true || statusModel.availability!=true || statusModel.liscense!=true){
+          Navigator.of(context,rootNavigator: true).pushNamedAndRemoveUntil(RoutesName.doctorEnrollment, (r)=>false);
+          return;
+        }
+        loader=false;
+        setState(() {
 
+        });
+      }
     });
+    connectToToSocket();
+  }
+
+  void connectToToSocket()async{
+    UserInfo? user=await LocalDB.getUserInfo();
+    userSocket = IO.io('https://chatapi.kaustubhamedtech.com', IO.OptionBuilder()
+        .setTransports(['websocket']) // for Flutter or Dart VM
+        .disableAutoConnect()  // Optional, disable auto-connect
+        .build());
+    userSocket!.connect();
+    userSocket?.on('connect', (_){
+      userSocket?.emit('getsetId', {'userId':user?.id});
+    });
+
   }
 
   void onNavBarChange(route){
-    if(currentRoute!=route){
+    if(currentRoute!=route && route==RoutesName.doctorHome && navKey.currentState?.canPop()==true){
+      navKey.currentState?.pop();
+    }else{
+      print('navigate');
       navToPage(route);
     }
   }
 
   void navToPage(String routeName){
-    if(currentRoute==RoutesName.patientHome) {
+    if(currentRoute==RoutesName.doctorHome) {
       navKey.currentState?.pushNamed(routeName);
     }else{
       navKey.currentState?.pushReplacementNamed(routeName);

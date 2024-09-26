@@ -36,29 +36,41 @@ class RoutesName {
   static const String reScheduleAppointment = "re_schedule_appointment";
   static const String addReview = "add_review";
 
+
+  ///patientConsult
+  static const String consult = "consult";
+  static const String patientDoctorDetails = "patientDoctorDetails";
+  static const String appointmentTimeSlot = "appointmentTimeSlot";
+  static const String payment = "payment_screen";
+  static const String bookAppointment = "bookAppointment";
+
+
+  ///patientChat
+  static const String contactList = "contactList";
+  static const String chat = "chat";
+
+  ///patientTracker
+  static const String tracker = "tracker";
+
+
+  ///doctorEnrollment
+  static const String doctorEnrollment='doctorEnrollment';
+
   ///doctorAppointments
   static const String doctorAppointments = "doctorAppointments";
+  static const String doctorAppointmentReschedule = "doctorAppointmentReschedule";
 
   ///doctorCalendar
   static const String doctorCalendar = "doctorCalendar";
 
   ///doctorSchedule
-  static const String doctorSchedule = "doctorSchedule";
+  static const String doctorPatients = "doctorPatients";
 
   ///doctorChat
+  static const String doctorContactList = "doctorContactList";
   static const String doctorChat = "doctorChat";
-
-  ///patientConsult
-  static const String consult = "consult";
-  static const String patientDoctorDetails = "patientDoctorDetails";
-  static const String bookAppointment = "book_appointment";
-  static const String payment = "payment_screen";
-
-  ///patientChat
-  static const String chat = "chat";
-
-  ///patientTracker
-  static const String tracker = "tracker";
+  static const String createCommunity = "createCommunity";
+  static const String communityChat = "communityChat";
 
 
   ///profile
@@ -66,5 +78,9 @@ class RoutesName {
   static const String editProfile = "editProfile";
   static const String verifyUpdateOTP = "verifyUpdateOTP";
   static const String notifications = "notifications";
+  static const String reviews = "doctor_reviews";
+  static const String patientDocuments = "patient_documents";
+  static const String patientTransactions = "patientTransactions";
+  static const String doctorTransactions = "doctorTransactions";
 
 }

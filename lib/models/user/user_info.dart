@@ -1,3 +1,5 @@
+import 'package:kaustubha_medtech/models/patient_document/PatientDocuments.dart';
+
 class UserInfo {
   static const String userIdKey = 'id';
   static const String userNameKey = 'name';
@@ -9,6 +11,8 @@ class UserInfo {
   static const String userNumberVerifiedKey = 'numberVerified';
   static const String userImageKey = 'image';
   static const String userAboutKey = 'about';
+  static const String socketKey = 'socket_id';
+  static const String patientReportsDocKey = 'patientReportsDoc';
 
   UserInfo({
     String? id,
@@ -21,6 +25,7 @@ class UserInfo {
     bool? numberVerified,
     dynamic image,
     dynamic about,
+    PatientDocumentsModel? documentModel,
   }) {
     _id = id;
     _name = name;
@@ -32,6 +37,7 @@ class UserInfo {
     _numberVerified = numberVerified;
     _image = image;
     _about = about;
+    _documentsModel=documentModel;
   }
 
   UserInfo.fromJson(dynamic json) {
@@ -45,6 +51,10 @@ class UserInfo {
     _numberVerified = json[userNumberVerifiedKey];
     _image = json[userImageKey];
     _about = json[userAboutKey];
+    _socket = json[socketKey];
+    if(json['patientReportsDoc']!=null){
+      _documentsModel=PatientDocumentsModel.fromJson(json['patientReportsDoc']);
+    }
   }
 
   String? _id;
@@ -57,6 +67,8 @@ class UserInfo {
   bool? _numberVerified;
   dynamic _image;
   dynamic _about;
+  dynamic _socket;
+  PatientDocumentsModel? _documentsModel;
 
   String? get id => _id;
   String? get name => _name;
@@ -68,6 +80,8 @@ class UserInfo {
   bool? get numberVerified => _numberVerified;
   dynamic get image => _image;
   dynamic get about => _about;
+  dynamic get socket => _socket;
+  PatientDocumentsModel? get documentsModel => _documentsModel;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -81,6 +95,10 @@ class UserInfo {
     map[userNumberVerifiedKey] = _numberVerified;
     map[userImageKey] = _image;
     map[userAboutKey] = _about;
+    map[socketKey] = _socket;
+    if(_documentsModel!=null){
+    map[patientReportsDocKey]=_documentsModel?.toJson();
+    }
     return map;
   }
 }

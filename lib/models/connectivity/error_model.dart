@@ -2,19 +2,25 @@ import 'package:kaustubha_medtech/models/user/user_info.dart';
 
 class ResponseMessage{
   String? error;
-  String? success;
-  UserInfo? user;
+  dynamic success;
+  dynamic user;
   String? message;
   bool? status;
-  ResponseMessage({this.success, this.error,this.message,this.status});
+  dynamic data;
+  dynamic reviews;
+  dynamic doctor;
+  dynamic filePath;
+  ResponseMessage({this.success, this.error,this.message,this.status,this.data});
 
   ResponseMessage.fromJson(dynamic json){
     error = json["error"];
     success = json["success"];
     status = json["status"];
     message = json["message"];
-    if(json['user']!=null) {
-      user = UserInfo.fromJson(json["user"]);
-    }
+    user = json["user"];
+    data=json['data'];
+    doctor=json['doctor'];
+    reviews=json['reviews'];
+    filePath=json['url'];
   }
 }

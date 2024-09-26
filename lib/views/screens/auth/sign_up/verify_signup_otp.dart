@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
 import 'package:kaustubha_medtech/models/user/user_info.dart';
+import 'package:kaustubha_medtech/utils/constants/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/sign_up_provider.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_back_button.dart';
@@ -71,7 +72,7 @@ class _VerifySignUpOTPState extends State<VerifySignUpOTP> {
                         OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp3,),
                         OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp4,),
                         OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp5,),
-                        OtpTextField(nextFocus:()=> verifyOTP(provider),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp6,),
+                        OtpTextField(nextFocus:() {},prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp6,),
                       ],
                     ),
                     SizedBox(
@@ -116,8 +117,8 @@ class _VerifySignUpOTPState extends State<VerifySignUpOTP> {
     if (message.user != null || message.success!=null) {
       CustomPopUp.showSnackBar(context, "${email ?? number ?? ""} Registered Successfully", Colors.green);
       LocalDB.setUserLogin(true);
-      LocalDB.setUserInfo(message.user ?? UserInfo());
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.patientMain,(r)=>false);
+      LocalDB.setUserInfo(UserInfo.fromJson(message.user));
+      Navigator.pushNamedAndRemoveUntil(context,UserInfo.fromJson(message.user).role==Constants.patientRole? RoutesName.patientMain:RoutesName.doctorMain,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }

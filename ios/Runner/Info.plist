@@ -4,6 +4,14 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+    <string>We need access to the camera for video calls.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need access to the microphone for video calls.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>This app requires access to the local network.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app requires access to your location.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -16,6 +24,12 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>kaustubha_medtech</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>This app requires access to the photo library to select images.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>This app requires access to the camera to take photos.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>This app requires permission to save images to your photo library.</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

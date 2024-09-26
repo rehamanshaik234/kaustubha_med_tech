@@ -2,9 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kaustubha_medtech/controller/providers/patient/patient_appointments.dart';
+import 'package:kaustubha_medtech/controller/providers/review/review_provider.dart';
+import 'package:kaustubha_medtech/models/appointments/DoctorDetailsModel.dart';
 import 'package:kaustubha_medtech/models/consult/DoctorInfo.dart';
+import 'package:kaustubha_medtech/models/reviews/ReviewModel.dart';
 import 'package:kaustubha_medtech/utils/routes/route_names.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
+import 'package:kaustubha_medtech/views/widgets/review_card.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../../utils/app_colors/app_colors.dart';
 import '../../../../../utils/constants/asset_urls.dart';
@@ -36,46 +42,60 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         title: Text("Doctor Details",style: GoogleFonts.dmSans(fontWeight: FontWeight.w700,fontSize: 20.sp),),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            doctorCard(DoctorInfo(
-                doctorName: 'Dr. David Patel',
-                doctorSpecialist: "Obstetricians",
-                address: 'Cardiology Center, USA',
-                ratings: 5,
-                reviewsCount: 1200
-            ),),
-            SizedBox(height: 16.h,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                doctorRecords(CupertinoIcons.person_2_fill, "2,000+", "patients"),
-                doctorRecords(Icons.medical_services, "10+", "experience"),
-                doctorRecords(Icons.star_rounded, "5", "rating"),
-                doctorRecords(Icons.rate_review_rounded, "1,834", "reviews"),
-              ],
+      body: Consumer2<PatientAppointmentProvider,ReviewProvider>(
+        builder: (context,appointmentProvider,reviewProvider,_) {
+          if(appointmentProvider.loader || reviewProvider.loader){
+            return const Center(child: CircularProgressIndicator(color: Colors.black,),);
+          }
+          DoctorDetailsModel doctorDetailsModel=appointmentProvider.doctorDetails;
+          Profile? doctorProfile= appointmentProvider.doctorDetails.profile;
+          Availability? availability=appointmentProvider.doctorDetails.availability;
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  doctorCard(appointmentProvider.doctorDetails),
+                  SizedBox(height: 16.h,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      doctorRecords(CupertinoIcons.person_2_fill, "2,000+", "${reviewProvider.reviews.length}"),
+                      doctorRecords(Icons.medical_services, "${doctorProfile?.experienceYears ?? "0 years"} yrs", "experience"),
+                      doctorRecords(Icons.star_rounded, "${doctorDetailsModel.avgRatings ?? '0'}", "rating"),
+                      doctorRecords(Icons.rate_review_rounded, "${doctorDetailsModel.totalReviews ?? '0'}", "reviews"),
+                    ],
+                  ),
+                  SizedBox(height: 16.h,),
+                  about(),
+                  SizedBox(height: 16.h,),
+                  workingTimes(availability),
+                  SizedBox(height: 16.h,),
+                  reviews(reviewProvider.reviews),
+                  SizedBox(height: 60.h,)
+                ],
+              ),
             ),
-            SizedBox(height: 16.h,),
-            about(),
-            SizedBox(height: 16.h,),
-            workingTimes(),
-            SizedBox(height: 16.h,),
-            reviews(),
-          ],
-        ),
+          );
+        }
       ),
-      bottomSheet: Padding(
-        padding: EdgeInsets.all(16.sp),
-        child: CustomButton(onPressed: (){
-          Navigator.pushNamed(context, RoutesName.bookAppointment);
-        }, title: "Book Appointment",borderRadius: BorderRadius.circular(25.sp),),
+      bottomSheet: Consumer2<PatientAppointmentProvider,ReviewProvider>(
+        builder:(context,appointmentProvider,reviewProvider,_) {
+          if(appointmentProvider.loader || reviewProvider.loader){
+            return const Center();
+          }
+          return Padding(
+            padding: EdgeInsets.all(16.sp),
+            child: CustomButton(onPressed: (){
+              Navigator.pushNamed(context, RoutesName.appointmentTimeSlot,arguments: {"doctor_id":doctorId});
+            }, title: "Book Appointment",borderRadius: BorderRadius.circular(25.sp),),
+          );
+        }
       ),
     );
   }
 
-  Widget doctorCard(DoctorInfo doctorInfo){
+  Widget doctorCard(DoctorDetailsModel doctorInfo){
     return Card(
       elevation: 5,
       color: Colors.white,
@@ -84,7 +104,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image(image: AssetImage(AssetUrls.doctorProfile),height: 100.h,),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(8.sp),
+                child: Image(image:doctorInfo.image!=null?NetworkImage(doctorInfo.image): AssetImage(AssetUrls.doctorProfile),
+                  height: 100.h,width: 100.w,fit: BoxFit.cover,)),
             SizedBox(width: 8.w,),
             Expanded(
               child: Column(
@@ -94,18 +117,18 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(doctorInfo.doctorName ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
+                      Text(doctorInfo.profile?.legalName ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
                     ],
                   ),
                   SizedBox(height: 8.h,),
                   Divider(color: Colors.grey.shade400,height: 2.h,),
                   SizedBox(height: 4.h,),
-                  Text(doctorInfo.doctorSpecialist ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w600,fontSize: 14.sp,color: Colors.black54),),
+                  Text(doctorInfo.profile?.specialization ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w600,fontSize: 14.sp,color: Colors.black54),),
                   SizedBox(height: 4.h,),
                   Row(
                     children: [
                       Icon(Icons.location_on_outlined,color: Colors.grey,size: 16.sp,),
-                      Text(doctorInfo.address ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
+                      Text(doctorInfo.profile?.address ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
                     ],
                   ),
                 ],
@@ -127,17 +150,6 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         Text(subTitle,style: GoogleFonts.inter(fontSize: 14.sp,fontWeight: FontWeight.w400,color: Colors.black54),),
       ],
     );
-  }
-
-
-  void getDoctorId() {
-    Map? data=ModalRoute.of(context)?.settings.arguments as Map?;
-    if(data!=null){
-      doctorId=data['doctor_id'];
-      setState(() {
-
-      });
-    }
   }
 
   Widget about() {
@@ -163,7 +175,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     );
   }
 
-  Widget workingTimes() {
+  Widget workingTimes(Availability? availability) {
+    String to= availability!=null && availability.availableTimeSlot!=null && availability.availableTimeSlot!.isNotEmpty?
+    availability.availableTimeSlot!.last:'';
+    List<String> weeks=availability!=null? availability.availableDays ?? []:[];
     return SizedBox(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,14 +189,22 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             ],
           ),
           SizedBox(height: 8.h,),
-          Text("Monday-Friday, 08.00 AM-18.00 pM",
-              style:GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54) ),
+          Wrap(
+            alignment: WrapAlignment.start,
+            children: [
+              Text("${weeks.map<String>((day) => day).join(', ')} (${availability?.availableTimeFrom ?? ""} - $to)",
+                  style:GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54) ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget reviews() {
+  Widget reviews(List<ReviewModel> reviews) {
+    if(reviews.isEmpty){
+      return Container();
+    }
     return SizedBox(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,40 +218,26 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             ],
           ),
           SizedBox(height: 16.h,),
-          Column(
-            children: [
-              Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(30.sp),
-                      child: Image(image: AssetImage(AssetUrls.doctorsProfile),height: 60.h,width: 60.w,fit: BoxFit.cover,)),
-                  SizedBox(width: 8.w,),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Emily Anderson",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
-                      SizedBox(height: 8.h,),
-                      Row(
-                        children: [
-                          Text('5.0',style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 12.sp,color: Colors.black54),),
-                          Icon(Icons.star,color: AppColors.ratingColor,size: 16.sp,),
-                          Icon(Icons.star,color: AppColors.ratingColor,size: 16.sp,),
-                          Icon(Icons.star,color: AppColors.ratingColor,size: 16.sp,),
-                          Icon(Icons.star,color: AppColors.ratingColor,size: 16.sp,),
-                          Icon(Icons.star,color: AppColors.ratingColor,size: 16.sp,),
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              ),
-              SizedBox(height: 8.h,),
-              Text('Dr. Patel is a true professional who genuinely cares about his patients. I highly recommend Dr. Patel to anyone seeking exceptional cardiac care.',
-              style:GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54) ,)
-            ],
-          )
+          ...reviews.map((review){
+            return ReviewCard(review: review);
+          }),
         ],
       ),
     );
+  }
+
+
+  void getDoctorId()async{
+    Map? data=ModalRoute.of(context)?.settings.arguments as Map?;
+    PatientAppointmentProvider provider=Provider.of<PatientAppointmentProvider>(context,listen: false);
+    ReviewProvider reviewProvider=Provider.of<ReviewProvider>(context,listen: false);
+    if(data!=null){
+      doctorId=data['doctor_id'].toString();
+      Map<String,dynamic> reviewData={'doctorId':doctorId};
+      Future.wait([
+        provider.getDoctorDetails(doctorId, (r){}),
+        reviewProvider.getDoctorReviews(reviewData, (r){})
+      ]);
+    }
   }
 }

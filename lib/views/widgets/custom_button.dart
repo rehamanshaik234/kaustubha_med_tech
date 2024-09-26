@@ -28,14 +28,14 @@ class CustomButton extends StatelessWidget {
             style: ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(bgColor ?? AppColors.primaryColor),
                     padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(padding ?? 12.sp)),
                     shape: WidgetStatePropertyAll<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: borderRadius ?? BorderRadius.circular(8.sp)))  ),
-            onPressed: onPressed, child:loader?Row(
+            onPressed: loader? (){}:onPressed, child:loader?Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
               height: 25.h,
               width: 25.w,
-              child: CircularProgressIndicator(
-                color: Colors.white,
+              child: CircularProgressIndicator.adaptive(
+                backgroundColor: Colors.white,
                 strokeWidth: 1.sp,
               ),
             )
