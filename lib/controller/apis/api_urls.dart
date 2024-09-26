@@ -14,6 +14,13 @@ class ApiUrls{
   static String verifyLoginNumberOTP='/auth/login/otp-login';
   static String sendLoginNumberOTP='/auth/login/send-otp';
 
+
+  ///patientHome
+  static String recommendedDoctors='/patients/dashboard/recomended-doctor';
+
+  ///patientAppointment
+  static String patientUpcomingAppointment='/patients/dashboard/upcomming-appoinments';
+
   ///Tracker
   static String patientTracker='/patients/tracker/get';
 

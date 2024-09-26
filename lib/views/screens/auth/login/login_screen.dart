@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
       CustomPopUp.showSnackBar(context, "${message.success}", Colors.greenAccent);
       LocalDB.setUserLogin(true);
       LocalDB.setUserInfo(message.user ?? UserInfo());
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.patientMain,(r)=>false);
+      Navigator.pushNamedAndRemoveUntil(context,message.user?.role==Constants.patientRole? RoutesName.patientMain:RoutesName.doctorMain,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }

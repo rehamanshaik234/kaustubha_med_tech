@@ -2,11 +2,12 @@ import 'package:kaustubha_medtech/models/user/user_info.dart';
 
 class ResponseMessage{
   String? error;
-  String? success;
+  dynamic success;
   UserInfo? user;
   String? message;
   bool? status;
-  ResponseMessage({this.success, this.error,this.message,this.status});
+  dynamic data;
+  ResponseMessage({this.success, this.error,this.message,this.status,this.data});
 
   ResponseMessage.fromJson(dynamic json){
     error = json["error"];
@@ -16,5 +17,6 @@ class ResponseMessage{
     if(json['user']!=null) {
       user = UserInfo.fromJson(json["user"]);
     }
+    data=json['data'];
   }
 }

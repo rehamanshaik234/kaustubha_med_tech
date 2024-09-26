@@ -75,7 +75,9 @@ class _DoctorMainScreenState extends State<DoctorMainScreen> {
   }
 
   void onNavBarChange(route){
-    if(currentRoute!=route){
+    if(currentRoute!=route && route==RoutesName.doctorHome && navKey.currentState?.canPop()==true){
+      navKey.currentState?.pop();
+    }else{
       navToPage(route);
     }
   }

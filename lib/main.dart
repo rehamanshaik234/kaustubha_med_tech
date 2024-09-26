@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/login_provider.dart';
+import 'package:kaustubha_medtech/controller/providers/patient/patient_appointments.dart';
+import 'package:kaustubha_medtech/controller/providers/patient/patient_home.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
 import 'package:kaustubha_medtech/controller/providers/user/user_provider.dart';
 import 'package:kaustubha_medtech/utils/routes/route_observer.dart';
@@ -20,6 +22,8 @@ void main()async{
     ChangeNotifierProvider(create: (context)=>LoginProvider()),
     ChangeNotifierProvider(create: (context)=>TrackerProvider()),
     ChangeNotifierProvider(create: (context)=>UserProvider()),
+    ChangeNotifierProvider(create: (context)=>PatientHomeProvider()),
+    ChangeNotifierProvider(create: (context)=>PatientAppointmentProvider()),
     ],
     child: const MyApp(),));
 }
@@ -36,6 +40,9 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             cardTheme: CardTheme(color: Colors.white),
+            appBarTheme: AppBarTheme(
+              backgroundColor: AppColors.scaffoldBgColor
+            ),
             bottomNavigationBarTheme: BottomNavigationBarThemeData(
               elevation: 0,
               backgroundColor: Colors.transparent
@@ -46,7 +53,7 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
 
-          initialRoute: RoutesName.onboarding,
+          initialRoute: RoutesName.doctorEnrollment,
           onGenerateRoute: (settings){
             return Routes.generateRoute(settings, (currentRoute){});
           },

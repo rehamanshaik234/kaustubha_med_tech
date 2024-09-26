@@ -32,7 +32,6 @@ class _TrackerScreenState extends State<TrackerScreen> with SingleTickerProvider
   void initState() {
    tabController=TabController(length: 3, vsync: this);
    WidgetsBinding.instance.addPostFrameCallback((_){
-     getTrackerInfo();
      tabController.addListener(onChangeTab);
    });
    // TODO: implement initState
