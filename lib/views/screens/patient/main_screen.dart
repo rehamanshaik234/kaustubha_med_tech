@@ -3,6 +3,7 @@ import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
 import 'package:kaustubha_medtech/controller/providers/tracker/tracker.dart';
 import 'package:kaustubha_medtech/controller/providers/user/user_provider.dart';
 import 'package:kaustubha_medtech/models/user/user_info.dart';
+import 'package:kaustubha_medtech/utils/routes/patient_routes.dart';
 import 'package:kaustubha_medtech/utils/routes/route_observer.dart';
 import 'package:kaustubha_medtech/views/widgets/patient_custom_navigation_bar.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +51,7 @@ class _PatientMainScreenState extends State<PatientMainScreen> {
               observers: [routeObserver],
               initialRoute: RoutesName.patientHome,
               onGenerateRoute: (settings){
-                return Routes.generateRoute(settings, onChangeRoute);
+                return PatientRoutes.generateRoute(settings, onChangeRoute);
               },
             ),
             bottomSheet: CustomPatientBottomNavBar(onChange: onNavBarChange,currentRoute: currentRoute,),
@@ -69,8 +70,9 @@ class _PatientMainScreenState extends State<PatientMainScreen> {
 
   void getUserInfo()async{
     UserInfo? userInfo=await LocalDB.getUserInfo();
-    await Provider.of<TrackerProvider>(context,listen: false).getPatientTracker((response){});
-    await Provider.of<UserProvider>(context,listen: false).getUserInfo((response){});
+    await Future.wait([
+                     Provider.of<TrackerProvider>(context,listen: false).getPatientTracker((response){}),
+                     Provider.of<UserProvider>(context,listen: false).getUserInfo((response){})]);
     loader=false;
     setState(() {
 
@@ -78,7 +80,9 @@ class _PatientMainScreenState extends State<PatientMainScreen> {
   }
 
   void onNavBarChange(route){
-    if(currentRoute!=route){
+    if(currentRoute!=route && route==RoutesName.patientHome && navKey.currentState?.canPop()==true){
+      navKey.currentState?.pop();
+    }else{
       navToPage(route);
     }
   }

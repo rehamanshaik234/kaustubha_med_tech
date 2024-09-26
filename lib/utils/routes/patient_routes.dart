@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaustubha_medtech/utils/routes/route_names.dart';
 import 'package:kaustubha_medtech/utils/routes/route_observer.dart';
-import 'package:kaustubha_medtech/views/screens/auth/doctor_enrollment/doctor_enrollment_screen.dart';
 import 'package:kaustubha_medtech/views/screens/auth/login/verify_otp/verify_login_otp.dart';
 import 'package:kaustubha_medtech/views/screens/doctor/main_screen.dart';
 import 'package:kaustubha_medtech/views/screens/patient/appointment/childrens/add_review.dart';
@@ -31,9 +30,7 @@ import '../../views/screens/patient/tracker/tracker_screen.dart';
 import '../../views/screens/onboarding/onboarding_screen.dart';
 import '../../views/screens/onboarding/welcome.dart';
 
-
-
-class Routes {
+class PatientRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings,Function(String?) onPopRoute) {
     switch (settings.name) {
       case RoutesName.onboarding:
@@ -129,7 +126,98 @@ class Routes {
               child: const DoctorMainScreen(),
             )
         );
-      case RoutesName.profile:
+
+        case RoutesName.patientHome:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.patientHome,
+              onPop: onPopRoute,
+              child: const PatientHomeScreen(),
+            )
+        );
+        case RoutesName.patientAppointments:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.patientAppointments,
+              onPop: onPopRoute,
+              child:  MyAppointmentsScreen(),
+            )
+        );
+        case RoutesName.reScheduleAppointment:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.reScheduleAppointment,
+              onPop: onPopRoute,
+              child:  RescheduleAppointment(),
+            )
+        );
+        case RoutesName.addReview:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.addReview,
+              onPop: onPopRoute,
+              child:  AddReview(),
+            )
+        );
+        case RoutesName.consult:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.consult,
+              onPop: onPopRoute,
+              child:  ConsultScreen(),
+            )
+        );
+        case RoutesName.patientDoctorDetails:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.patientDoctorDetails,
+              onPop: onPopRoute,
+              child:  DoctorDetails(),
+            )
+        );
+        case RoutesName.bookAppointment:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.bookAppointment,
+              onPop: onPopRoute,
+              child:  BookAppointment(),
+            )
+        );
+        case RoutesName.payment:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.bookAppointment,
+              onPop: onPopRoute,
+              child:  PaymentScreen(),
+            )
+        );
+        case RoutesName.chat:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.chat,
+              onPop: onPopRoute,
+              child:  ChatScreen(),
+            )
+        );
+        case RoutesName.tracker:
+        return MaterialPageRoute(
+            settings:settings,
+            builder: (context)=>RouteAwareWidget(
+              routeName: RoutesName.tracker,
+              onPop: onPopRoute,
+              child: TrackerScreen(),
+            )
+        );
+        case RoutesName.profile:
         return MaterialPageRoute(
             settings:settings,
             builder: (context)=>RouteAwareWidget(
@@ -138,7 +226,7 @@ class Routes {
               child: const ProfileScreen(),
             )
         );
-      case RoutesName.editProfile:
+        case RoutesName.editProfile:
         return MaterialPageRoute(
             settings:settings,
             builder: (context)=>RouteAwareWidget(
@@ -147,7 +235,7 @@ class Routes {
               child: const EditProfileScreen(),
             )
         );
-      case RoutesName.verifyUpdateOTP:
+        case RoutesName.verifyUpdateOTP:
         return MaterialPageRoute(
             settings:settings,
             builder: (context)=>RouteAwareWidget(
@@ -156,22 +244,13 @@ class Routes {
               child: const VerifyUpdateOTP(),
             )
         );
-      case RoutesName.notifications:
+        case RoutesName.notifications:
         return MaterialPageRoute(
             settings:settings,
             builder: (context)=>RouteAwareWidget(
               routeName: RoutesName.notifications,
               onPop: onPopRoute,
               child: const NotificationsScreen(),
-            )
-        );
-        case RoutesName.doctorEnrollment:
-        return MaterialPageRoute(
-            settings:settings,
-            builder: (context)=>RouteAwareWidget(
-              routeName: RoutesName.doctorEnrollment,
-              onPop: onPopRoute,
-              child: const DoctorEnrollmentScreen(),
             )
         );
 

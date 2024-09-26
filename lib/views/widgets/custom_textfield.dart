@@ -6,7 +6,7 @@ import 'package:kaustubha_medtech/main.dart';
 class CustomTextField extends StatefulWidget {
   CustomTextField({super.key,required this.hintText,this.isPassword=false,this.inputType=TextInputType.text,
     required this.textEditingController,this.focusNode,this.onEditingCompleted,this.onChange,this.readOnly,
-    this.outlinedBorder,this.includeSpacing,this.border,this.lines=1,this.outlineColor,this.fillColor});
+    this.outlinedBorder,this.includeSpacing,this.border,this.lines=1,this.outlineColor,this.fillColor,this.onTap,this.validator});
   String hintText;
   bool isPassword;
   TextInputType inputType;
@@ -20,7 +20,9 @@ class CustomTextField extends StatefulWidget {
   Color? outlineColor;
   InputBorder? border;
   int lines;
+  VoidCallback? onTap;
   Color? fillColor;
+  String? Function(String?)? validator;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -30,7 +32,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
   bool showPassword=true;
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+        validator: widget.validator,
         controller: widget.textEditingController,
         keyboardType: widget.inputType,
         obscureText: widget.isPassword? showPassword : false,
@@ -50,8 +53,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
             if (widget.onChange != null) {
               widget.onChange!(newText);
             }
+            setState(() {});
           }
         },
+        onTap:widget.onTap,
         maxLines: widget.lines,
         decoration: InputDecoration(
           hintText: widget.hintText,

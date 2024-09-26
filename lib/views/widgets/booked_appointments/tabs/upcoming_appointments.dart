@@ -2,10 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kaustubha_medtech/controller/providers/patient/patient_appointments.dart';
 import 'package:kaustubha_medtech/models/appointments/appointment_info.dart';
+import 'package:kaustubha_medtech/utils/constants/constants.dart';
 import 'package:kaustubha_medtech/utils/routes/route_names.dart';
 import 'package:kaustubha_medtech/views/alerts/book_appointment.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../utils/app_colors/app_colors.dart';
 import '../../../../utils/constants/asset_urls.dart';
@@ -17,46 +20,44 @@ class UpcomingAppointments extends StatefulWidget {
 }
 
 class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
-  List<AppointmentInfo> appointments=[
-    AppointmentInfo(
-        doctorName: 'Dr. David Patel',
-        doctorSpecialist: "Obstetricians",
-        address: 'Cardiology Center, USA',
-        dateTime: 'May 22, 2025 - 10.00 AM',
-        reviewsCount: 1200
-    ),
-    AppointmentInfo(
-        doctorName: 'Dr. David Patel',
-        doctorSpecialist: "Obstetricians",
-        address: 'Cardiology Center, USA',
-        dateTime: 'May 22, 2025 - 10.00 AM',
-        reviewsCount: 1200
-    ),
-    AppointmentInfo(
-        doctorName: 'Dr. David Patel',
-        doctorSpecialist: "Obstetricians",
-        address: 'Cardiology Center, USA',
-        dateTime: 'May 22, 2025 - 10.00 AM',
-        reviewsCount: 1200
-    ),
-    AppointmentInfo(
-        doctorName: 'Dr. David Patel',
-        doctorSpecialist: "Obstetricians",
-        address: 'Cardiology Center, USA',
-        dateTime: 'May 22, 2025 - 10.00 AM',
-        reviewsCount: 1200
-    ),
-  ];
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      getAppointments();
+    });
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: appointments.length,
-        itemBuilder: (context,index){
-          return Padding(
-            padding: EdgeInsets.only(top: index==0? 8.h:0,bottom:appointments.length==index+1?60.h:8.h,left: 8.w,right: 8.w,),
-            child: appointmentCard(appointments[index]),
+    return Consumer<PatientAppointmentProvider>(
+      builder: (context,provider,child) {
+        if(provider.loader && !provider.isUpcomingAptFetched){
+         return Center(
+           child: CircularProgressIndicator(
+             color: Colors.black,
+             strokeWidth: 2.w,
+           ),
+         );
+        }
+
+        if(provider.upcomingAppointments.isEmpty){
+          return Center(
+            child: Text("No Appointments Found",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 16.sp),),
           );
-        });
+        }
+        List<AppointmentInfo> appointments=provider.upcomingAppointments;
+        return ListView.builder(
+            itemCount: provider.upcomingAppointments.length,
+            itemBuilder: (context,index){
+              return Padding(
+                padding: EdgeInsets.only(top: index==0? 8.h:0,bottom:appointments.length==index+1?60.h:8.h,left: 8.w,right: 8.w,),
+                child: appointmentCard(appointments[index]),
+              );
+            });
+      }
+    );
   }
 
   Widget appointmentCard(AppointmentInfo appointmentInfo){
@@ -67,7 +68,7 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(appointmentInfo.dateTime??"",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
+            Text("${Constants.dateConverted(appointmentInfo.date ??"")} - ${appointmentInfo.time ?? ""}",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
             SizedBox(height: 8.h,),
             Divider(color: Colors.grey.shade400,height: 2.h,),
             SizedBox(height: 8.h,),
@@ -83,13 +84,16 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
                     children: [
                       Text(appointmentInfo.doctorName ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
                       SizedBox(height: 8.h,),
-                      Text(appointmentInfo.doctorSpecialist ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w600,fontSize: 14.sp,color: Colors.black54),),
+                      Text(appointmentInfo.purpose ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w600,fontSize: 14.sp,color: Colors.black54),),
                       SizedBox(height: 8.h,),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on_outlined,color: Colors.grey,size: 16.sp,),
-                          Text(appointmentInfo.address ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
-                        ],
+                      Container(
+                        decoration: BoxDecoration(
+                          color: appointmentInfo.status!.contains('Not')?Colors.orangeAccent: Colors.green,
+                          borderRadius: BorderRadius.circular(20.sp)
+                        ),
+                        padding: EdgeInsets.all(8.sp),
+                        child: 
+                          Text(appointmentInfo.status ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color:Colors.white),),
                       ),
                     ],
                   ),
@@ -116,4 +120,11 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
       ),
     );
   }
+
+  void getAppointments(){
+   final provider= Provider.of<PatientAppointmentProvider>(context,listen: false);
+   provider.getUpcomingAppointments((r){});
+  }
+
+
 }

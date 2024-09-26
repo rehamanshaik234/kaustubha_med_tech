@@ -146,14 +146,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       borderSide: BorderSide(color: Colors.black54),
                     ),outlinedBorder: true,onChange: (t)=>setState(() {}),),
                     Visibility(
-                      visible: provider.user.email==null && provider.user.password==null,
+                      visible: email.text.isEmpty? provider.user.email!=null?true:false:true,
                       child: Column(
                         children: [
                           SizedBox(height: 16.h,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text('Password',style: GoogleFonts.dmSans(fontSize: 16.sp,fontWeight: FontWeight.w500),),
+                              Text('${provider.user.email!=null?"New  ":""} Password',style: GoogleFonts.dmSans(fontSize: 16.sp,fontWeight: FontWeight.w500),),
                             ],
                           ),
                           SizedBox(height: 8.h,),
@@ -167,7 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                     ),
                     SizedBox(height: 24.h,),
-                    CustomButton(onPressed: ()=>editProfile(provider), title: "Update",loader: provider.loader,),
+                    CustomButton(onPressed: ()=>checkVerification(provider), title: "Update",loader: provider.loader,),
                     SizedBox(height: 32.h,),
                   ],
                 ),
@@ -180,60 +180,71 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void editProfile(UserProvider provider){
-    if(validateFields()) {
-      Map<String, dynamic> params = {
-        'userId': provider.user.id,
+      Map<String, dynamic> params = {'userId': provider.user.id,
         UserInfo.userNameKey: name.text,
+        UserInfo.userEmailKey: email.text,
+        UserInfo.userPhoneKey: phone.text,
+        UserInfo.userPasswordKey:password.text,
       };
-      if(password.text.isNotEmpty){
-        params[UserInfo.userPasswordKey]=password.text;
-      }
-
-      if(provider.user.phone!=phone.text){
-        params[UserInfo.userPhoneKey]=phone.text;
-      }
-      if(provider.user.email!=email.text){
-        params[UserInfo.userEmailKey]=email.text;
-      }
       provider.updateProfile(params, onUpdateProfileResponse);
-    }
   }
 
   void onUpdateProfileResponse(ResponseMessage message)async{
     if(message.success!=null){
-       checkVerification();
+      Navigator.pushNamed(context, RoutesName.verifyUpdateOTP,arguments: {'email':email.text});
     }else{
       CustomPopUp.showSnackBar(context, message.success ?? 'Updated Successfully', Colors.redAccent);
     }
   }
 
-  void checkVerification()async{
-    UserProvider provider=Provider.of<UserProvider>(context,listen: false);
-      if(provider.user.numberVerified==false){
-          email.text=provider.user.email??'';
-          setState(() {
+  void checkVerification(UserProvider provider)async{
+    if(validateFields()){
+      if(phone.text!=provider.user.phone &&provider.user.email == null && email.text.isNotEmpty ||
+          provider.user.email != null && email.text != provider.user.email){
+        // CustomPopUp.showSnackBar(context, "You can only update Email/Number at Once", Colors.redAccent);
+        email.text=provider.user.email??'';
+        setState(() {
 
-          });
+        });
         await provider.sendNumberOTP({UserInfo.userPhoneKey: phone.text}, onSendNumberOTPResponse);
-      } else if (provider.user.email!=null && provider.user.email!.isNotEmpty && provider.user.emailVerified==null) {
+      } else if(phone.text!=provider.user.phone){
+        await provider.sendNumberOTP({UserInfo.userPhoneKey: phone.text}, onSendNumberOTPResponse);
+      }
+      else if (provider.user.email == null && email.text.isNotEmpty ||
+          provider.user.email != null && email.text != provider.user.email) {
         await provider.sendEmailOTP({UserInfo.userEmailKey: email.text}, onSendEmailOTPResponse);
       }else{
-        CustomPopUp.showSnackBar(context, "Updated SuccessFully", Colors.greenAccent);
+        editProfile(provider);
       }
+    }
   }
 
 
   void onSendEmailOTPResponse(ResponseMessage message)async{
-    if(message.success!=null){
-      Navigator.pushNamed(context, RoutesName.verifyUpdateOTP,arguments: {'email':email.text});
+    UserProvider provider=Provider.of<UserProvider>(context,listen: false);
+    Map<String, dynamic> params = {'userId': provider.user.id,
+      UserInfo.userNameKey: name.text,
+      UserInfo.userEmailKey: email.text,
+      UserInfo.userPhoneKey: phone.text,
+      UserInfo.userPasswordKey:password.text,
+    };
+    if(message.status==true){
+      Navigator.pushNamed(context, RoutesName.verifyUpdateOTP,arguments: {'email':email.text,'data':params});
     }else{
       CustomPopUp.showSnackBar(context, message.message ?? '', Colors.redAccent);
     }
   }
 
   void onSendNumberOTPResponse(ResponseMessage message)async{
-    if(message.success!=null){
-      Navigator.pushNamed(context, RoutesName.verifyUpdateOTP,arguments: {'number':phone.text});
+    UserProvider provider=Provider.of<UserProvider>(context,listen: false);
+    Map<String, dynamic> params = {'userId': provider.user.id,
+      UserInfo.userNameKey: name.text,
+      UserInfo.userEmailKey: email.text,
+      UserInfo.userPhoneKey: phone.text,
+      UserInfo.userPasswordKey:password.text,
+    };
+    if(message.status==true){
+      Navigator.pushNamed(context, RoutesName.verifyUpdateOTP,arguments: {'number':phone.text,'data':params});
     }else{
       CustomPopUp.showSnackBar(context, message.message ?? '', Colors.redAccent);
     }
@@ -242,8 +253,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   bool validateFields(){
     UserProvider provider= Provider.of<UserProvider>(context,listen: false);
-    if(provider.user.email!=null && provider.user.email!.isNotEmpty || email.text.isNotEmpty){
-      return validateName()  && validateNumber() && validateEmail() && email.text!=provider.user.email? validatePasswords():true;
+    if(provider.user.email!=null || email.text.isNotEmpty){
+      return validateName()  && validateNumber() && validateEmail() && validatePasswords();
     }
     return validateName() && validateNumber();
   }

@@ -36,17 +36,6 @@ class RoutesName {
   static const String reScheduleAppointment = "re_schedule_appointment";
   static const String addReview = "add_review";
 
-  ///doctorAppointments
-  static const String doctorAppointments = "doctorAppointments";
-
-  ///doctorCalendar
-  static const String doctorCalendar = "doctorCalendar";
-
-  ///doctorSchedule
-  static const String doctorSchedule = "doctorSchedule";
-
-  ///doctorChat
-  static const String doctorChat = "doctorChat";
 
   ///patientConsult
   static const String consult = "consult";
@@ -59,6 +48,22 @@ class RoutesName {
 
   ///patientTracker
   static const String tracker = "tracker";
+
+
+  ///doctorEnrollment
+  static const String doctorEnrollment='doctorEnrollment';
+
+  ///doctorAppointments
+  static const String doctorAppointments = "doctorAppointments";
+
+  ///doctorCalendar
+  static const String doctorCalendar = "doctorCalendar";
+
+  ///doctorSchedule
+  static const String doctorSchedule = "doctorSchedule";
+
+  ///doctorChat
+  static const String doctorChat = "doctorChat";
 
 
   ///profile

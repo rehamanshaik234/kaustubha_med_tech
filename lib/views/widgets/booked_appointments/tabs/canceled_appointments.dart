@@ -18,31 +18,31 @@ class _CanceledAppointmentsState extends State<CanceledAppointments> {
   List<AppointmentInfo> appointments=[
     AppointmentInfo(
         doctorName: 'Dr. David Patel',
-        doctorSpecialist: "Obstetricians",
-        address: 'Cardiology Center, USA',
-        dateTime: 'May 22, 2025 - 10.00 AM',
-        reviewsCount: 1200
+        slot: 2,
+        purpose: 'Cardiology Center, USA',
+        time: 'May 22, 2025 - 10.00 AM',
+        mode: '1200'
     ),
     AppointmentInfo(
         doctorName: 'Dr. David Patel',
-        doctorSpecialist: "Obstetricians",
-        address: 'Cardiology Center, USA',
-        dateTime: 'May 22, 2025 - 10.00 AM',
-        reviewsCount: 1200
+        slot: 2,
+        purpose: 'Cardiology Center, USA',
+        time: 'May 22, 2025 - 10.00 AM',
+        mode: '1200'
     ),
     AppointmentInfo(
         doctorName: 'Dr. David Patel',
-        doctorSpecialist: "Obstetricians",
-        address: 'Cardiology Center, USA',
-        dateTime: 'May 22, 2025 - 10.00 AM',
-        reviewsCount: 1200
+        slot: 2,
+        purpose: 'Cardiology Center, USA',
+        time: 'May 22, 2025 - 10.00 AM',
+        mode: '1200'
     ),
     AppointmentInfo(
         doctorName: 'Dr. David Patel',
-        doctorSpecialist: "Obstetricians",
-        address: 'Cardiology Center, USA',
-        dateTime: 'May 22, 2025 - 10.00 AM',
-        reviewsCount: 1200
+        slot: 2,
+        purpose: 'Cardiology Center, USA',
+        time: 'May 22, 2025 - 10.00 AM',
+        mode: '1200'
     ),
   ];
   @override
@@ -65,7 +65,7 @@ class _CanceledAppointmentsState extends State<CanceledAppointments> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(appointmentInfo.dateTime??"",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
+            Text(appointmentInfo.time??"",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
             SizedBox(height: 8.h,),
             Divider(color: Colors.grey.shade400,height: 2.h,),
             SizedBox(height: 8.h,),
@@ -81,12 +81,12 @@ class _CanceledAppointmentsState extends State<CanceledAppointments> {
                     children: [
                       Text(appointmentInfo.doctorName ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
                       SizedBox(height: 8.h,),
-                      Text(appointmentInfo.doctorSpecialist ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w600,fontSize: 14.sp,color: Colors.black54),),
+                      Text(appointmentInfo.mode ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w600,fontSize: 14.sp,color: Colors.black54),),
                       SizedBox(height: 8.h,),
                       Row(
                         children: [
                           Icon(Icons.location_on_outlined,color: Colors.grey,size: 16.sp,),
-                          Text(appointmentInfo.address ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
+                          Text(appointmentInfo.mode ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
                         ],
                       ),
                     ],

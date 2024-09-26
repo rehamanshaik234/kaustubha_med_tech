@@ -87,7 +87,7 @@ class DoctorRoutes {
         return MaterialPageRoute(
             settings:settings,
             builder: (context)=>RouteAwareWidget(
-              routeName: RoutesName.doctorAppointments,
+              routeName: RoutesName.doctorChat,
               onPop: onPopRoute,
               child:  DoctorChatScreen(),
             )
