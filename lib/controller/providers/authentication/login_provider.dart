@@ -19,6 +19,9 @@ class LoginProvider extends ChangeNotifier{
   bool _loader=false;
   bool get loader => _loader;
 
+  bool _signInLoader=false;
+  bool get signInLoader => _signInLoader;
+
   LoginModel _signUpModel= LoginModel();
   LoginModel get signUpModel => _signUpModel;
 
@@ -37,7 +40,7 @@ class LoginProvider extends ChangeNotifier{
   Future<void> loginWithEmilPwd(LoginModel login,Function(ResponseMessage message) onResponse)async{
        _loader=true;
       notifyListeners();
-      ApiResponse apiResponse = await loginRepo.signInWithEmail(login.toJson());
+      ApiResponse apiResponse = await loginRepo.signInWithEmailPwd(login.toJson());
       print(" apiResponse.Data.success ${apiResponse.response?.data.toString()}");
       if( apiResponse.response != null && apiResponse.response?.statusCode == 200 ){
         Map map = apiResponse.response!.data;
@@ -48,6 +51,25 @@ class LoginProvider extends ChangeNotifier{
       }else{
         onResponse(ResponseMessage(error: apiResponse.error));
         _loader=false;
+        notifyListeners();
+        print("Provider : APiResponse.Error");
+      }
+  }
+
+  Future<void> loginWithEmail(String email,Function(ResponseMessage message) onResponse)async{
+    _signInLoader=true;
+      notifyListeners();
+      ApiResponse apiResponse = await loginRepo.signInWithEmail(email);
+      print(" apiResponse.Data.success ${apiResponse.response?.data.toString()}");
+      if( apiResponse.response != null && apiResponse.response?.statusCode == 200 ){
+        Map map = apiResponse.response!.data;
+        final response = ResponseMessage.fromJson(map);
+        onResponse(response);
+        _signInLoader=false;
+        notifyListeners();
+      }else{
+        onResponse(ResponseMessage(error: apiResponse.error));
+        _signInLoader=false;
         notifyListeners();
         print("Provider : APiResponse.Error");
       }

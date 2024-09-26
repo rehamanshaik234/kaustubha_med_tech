@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/main.dart';
 import 'package:kaustubha_medtech/models/user/user_info.dart';
 import 'package:kaustubha_medtech/utils/constants/constants.dart';
-import 'package:kaustubha_medtech/utils/routes/route_names.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names/route_names.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_outline_button.dart';
 import 'package:kaustubha_medtech/views/widgets/logo.dart';
@@ -36,29 +36,48 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       backgroundColor: Colors.white,
       body: loader?const Center(child: CircularProgressIndicator(color: Colors.black,),): Padding(
         padding: EdgeInsets.all(16.sp),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 1.sh*0.15),
-            const LogoWidget(),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        child: SizedBox(
+          height: 1.sh,
+          width: 1.sw,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: Text("Explore Kaustubha Medtech",style: GoogleFonts.poppins(fontWeight: FontWeight.bold,fontSize: 32.sp),textAlign: TextAlign.center,)),
+                SizedBox(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 1.sh*0.15),
+                      LogoWidget(height: 150.sp,width: 150.sp,),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 150.h,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(child: Text("Explore Kaustubha Medtech",style: GoogleFonts.poppins(fontWeight: FontWeight.bold,fontSize: 32.sp),textAlign: TextAlign.center,)),
+                        ],
+                      ),
+                      SizedBox(height: 80.h),
+                      CustomButton(onPressed: (){
+                        Navigator.pushNamed(context, RoutesName.login);
+                      },title: "Sign In",),
+                      SizedBox(height: 24.h,),
+                      CustomOutlineButton(onPressed: (){
+                        Navigator.pushNamed(context, RoutesName.signUp);
+                      },title: "Create Account",),
+                      SizedBox(height: 80.h),
+                    ],
+                  ),
+                )
+
               ],
             ),
-            SizedBox(height: 80.h),
-            CustomButton(onPressed: (){
-              Navigator.pushNamed(context, RoutesName.login);
-            },title: "Sign In",),
-            SizedBox(height: 24.h,),
-            CustomOutlineButton(onPressed: (){
-              Navigator.pushNamed(context, RoutesName.signUp);
-            },title: "Create Account",),
-            SizedBox(height: 80.h),
-
-          ],
+          ),
         ),
       ),
     );

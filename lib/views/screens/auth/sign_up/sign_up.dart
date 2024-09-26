@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -10,13 +12,16 @@ import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
 import 'package:kaustubha_medtech/utils/constants/asset_urls.dart';
 import 'package:kaustubha_medtech/views/widgets/already_have_acnt_widget.dart';
 import 'package:kaustubha_medtech/views/widgets/logo.dart';
+import 'package:phone_text_field/model/phone_number.dart';
 import 'package:provider/provider.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/sign_up_provider.dart';
 import 'package:kaustubha_medtech/utils/constants/constants.dart';
-import 'package:kaustubha_medtech/utils/routes/route_names.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names/route_names.dart';
 import 'package:kaustubha_medtech/views/alerts/custom_alerts.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_textfield.dart';
+
+import '../../../widgets/phone_text_field.dart';
 
 
 class CreateAccount extends StatefulWidget {
@@ -35,10 +40,22 @@ class _CreateAccountState extends State<CreateAccount> {
   bool agreeTerms = false;
   bool isUser = true;
   FocusNode numberScope = FocusNode();
+  late GoogleSignIn googleSignIn;
+  PhoneNumber? phoneNumber;
 
   bool validateFields() {
     return validateEmail() && validateNumber() && validateName() &&
         validatePasswords() && validateTerms();
+  }
+
+  @override
+  void initState() {
+    if(Platform.isAndroid) {
+      googleSignIn = GoogleSignIn(scopes: ['email'],);
+    }else{
+      googleSignIn= GoogleSignIn(scopes: ['email'],clientId: '64130647433-3a8orgrdtrrntpnj3ltkgjh9g9odn0oo.apps.googleusercontent.com');
+    }
+    super.initState();
   }
 
   @override
@@ -54,7 +71,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 1.sh * 0.05),
-                    const LogoWidget(),
+                    LogoWidget(),
                     SizedBox(height: 24.h),
                     Text("Sign Up", style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold, fontSize: 24.sp)),
@@ -64,22 +81,15 @@ class _CreateAccountState extends State<CreateAccount> {
                     Row(
                       children: [
                         Expanded(
-                          child: Container(
-                            height: 50.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.sp),
-                              border: Border.all(color: Colors.black54),
-                            ),
-                            child: Image(image: AssetImage(AssetUrls.fbLogo)),
-                          ),
-                        ),
-                        SizedBox(width: 20.w,),
-                        Expanded(
                           child: InkWell(
                             onTap: () async {
-                              await GoogleSignIn(
-                                  clientId: "609903566583-ph449lcrplvca4hhiv3r0ddhlnsf3krr.apps.googleusercontent.com")
-                                  .signIn();
+                              final result=await googleSignIn.signIn();
+                              email.text=result?.email ?? '';
+                              if(fullName.text.isEmpty) {
+                                fullName.text = result?.displayName ?? '';
+                              }
+                              googleSignIn.signOut();
+                              setState((){});
                             },
                             child: Container(
                               height: 50.h,
@@ -92,39 +102,36 @@ class _CreateAccountState extends State<CreateAccount> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 20.w,),
-                        Expanded(
-                          child: Container(
-                            height: 50.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.sp),
-                              border: Border.all(color: Colors.black54),
-                            ),
-                            child: Image(
-                                image: AssetImage(AssetUrls.appleLogo)),
-                          ),
-                        ),
+                        // SizedBox(width: 20.w,),
+                        // Expanded(
+                        //   child: Container(
+                        //     height: 50.h,
+                        //     decoration: BoxDecoration(
+                        //       borderRadius: BorderRadius.circular(12.sp),
+                        //       border: Border.all(color: Colors.black54),
+                        //     ),
+                        //     child: Image(
+                        //         image: AssetImage(AssetUrls.appleLogo)),
+                        //   ),
+                        // ),
                       ],
                     ),
                     SizedBox(height: 16.h,),
                     CustomTextField(
                       hintText: "Full Name", textEditingController: fullName,includeSpacing: true,),
                     SizedBox(height: 24.h),
-                    CustomTextField(hintText: "Number",
-                      textEditingController: number,
-                      inputType: TextInputType.number,
-                      onChange: (text) {
-                        String currentText = number.text;
-                        if (currentText.isNotEmpty && !currentText.startsWith('+91')) {
-                          number.text = '+91$currentText';
-                          number.selection = TextSelection.fromPosition(
-                            TextPosition(offset: number.text.length),
-                          );
-                        }
+                    PhoneNumberTextField(hintText: "Phone", initialValue: number.text,onChange: (text){
+                      number.text=text?.completeNumber ?? '';
+                      phoneNumber=text;
+                      setState(() {});
+                    },
+                      onSubmit:(number){
+                        this.number.text = number.toString();
                         setState(() {});
-                      },),
+                      } ,
+                    ),
                     SizedBox(height: 16.h,),
-                    CustomTextField(hintText: "Email (Option)",
+                    CustomTextField(hintText: "Email (Optional)",
                       textEditingController: email,
                       onChange: (text) {
                         setState(() {});
@@ -172,7 +179,7 @@ class _CreateAccountState extends State<CreateAccount> {
 
 
   void onSignUpEmailResponse(ResponseMessage message) {
-    if (message.success != null) {
+    if (message.success != null || message.error?.contains('Verify')==true) {
       Map<String, dynamic>? arguments = {'email': email.text};
       Navigator.pushNamed(context, RoutesName.verifySignUpOTP, arguments: arguments);
     } else {
@@ -182,7 +189,7 @@ class _CreateAccountState extends State<CreateAccount> {
 
 
   void onSendOTPNumberResponse(ResponseMessage message) {
-    if (message.success != null) {
+    if (message.success != null || message.error?.contains('Verify')==true) {
       Map<String, dynamic>? arguments = {'number': number.text};
       Navigator.pushNamed(context, RoutesName.verifySignUpOTP, arguments: arguments);
     } else {
@@ -258,16 +265,25 @@ class _CreateAccountState extends State<CreateAccount> {
   }
 
   bool validateNumber() {
-    if (number.text
-        .replaceAll(" ", '')
-        .replaceAll('+91', '')
-        .length != 10) {
-      CustomPopUp.showSnackBar(context, "Enter Valid Number", Colors.redAccent);
-      numberScope.requestFocus();
+    if (number.text.isEmpty) {
+      CustomPopUp.showSnackBar(context, "Enter Phone Number", Colors.redAccent);
       return false;
-    } else {
-      return true;
     }
+
+    try {
+      if (phoneNumber?.isValidNumber() != true) {
+        CustomPopUp.showSnackBar(context, "Enter Valid Number", Colors.redAccent);
+        return false;
+      }
+    } catch (e) {
+      if (e is NumberTooShortException) {
+        CustomPopUp.showSnackBar(context, "Phone number is too short", Colors.redAccent);
+      } else {
+        CustomPopUp.showSnackBar(context, "Enter Valid Number", Colors.redAccent);
+      }
+      return false;
+    }
+    return true;
   }
 
   Widget agreeWithTermsConditions() {
@@ -300,7 +316,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
-                      print('Terms and Conditions tapped');
+                      Navigator.of(context,rootNavigator: true).pushNamed(RoutesName.termsAndConditions);
                     },
                 ),
               ],

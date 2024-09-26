@@ -5,6 +5,7 @@ import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
 import 'package:kaustubha_medtech/views/widgets/consult_widgets/payment_fileds.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_textfield.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../../../../alerts/book_appointment.dart';
 class PaymentScreen extends StatefulWidget {
@@ -15,6 +16,42 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+  Razorpay razorpay= Razorpay();
+
+  var options = {
+    'key': 'rzp_live_xbjNNeHZVe01E7',
+    'amount': 500,
+    'name': 'Acme Corp.',
+    'description': 'Fine T-Shirt',
+    'prefill': {
+      'contact': '8888888888',
+      'email': 'test@razorpay.com'
+    }
+  };
+
+  @override
+  void initState() {
+    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    // TODO: implement initState
+    super.initState();
+  }
+
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Do something when payment succeeds
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet was selected
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +103,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     PaymentFields(title: "Name", hint: "Enter Name", textEditingController: TextEditingController()),
                     SizedBox(height: 16.h,),
                     CustomButton(onPressed: (){
-                      AppointmentAlert.showBookedAppointment(context);
+                      razorpay.open(options);
+                      // AppointmentAlert.showBookedAppointment(context);
                     }, title: "Pay Now"),
                     SizedBox(height: 16.h,),
                   ],
@@ -79,4 +117,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
     );
   }
+
+
 }

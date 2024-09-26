@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:kaustubha_medtech/controller/apis/api_responses/error_response.dart';
 import 'package:kaustubha_medtech/controller/apis/api_urls.dart';
@@ -9,13 +11,25 @@ import '../../dio/dio_client.dart';
 class LoginRepo{
   final DioClient dioClient=DioClient(ApiUrls.baseUrl,Dio());
 
-  Future<ApiResponse> signInWithEmail(Map<String,dynamic> params)async{
+  Future<ApiResponse> signInWithEmailPwd(Map<String,dynamic> params)async{
     try{
-      Response response = await dioClient.post(ApiUrls.logInWithEmail, data:params );
+      log(params.toString());
+      Response response = await dioClient.post(ApiUrls.logInWithEmailPwd, data:params );
       return ApiResponse.withSuccess(response);
     }
     catch(e){
-      print("Api Response data exceptionerror= $e");
+      print("Api Response data exception error= $e");
+      return ApiResponse.withError(ApiErrorHandler.getMessage(e));
+    }
+  }
+
+  Future<ApiResponse> signInWithEmail(String email)async{
+    try{
+      Response response = await dioClient.post(ApiUrls.logInWithEmail, data: {'email':email});
+      return ApiResponse.withSuccess(response);
+    }
+    catch(e){
+      print("Api Response data exception error= $e");
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));
     }
   }
@@ -28,7 +42,7 @@ class LoginRepo{
       return ApiResponse.withSuccess(response);
     }
     catch(e){
-      print("Api Response data exceptionerror= $e");
+      print("Api Response data exception error= $e");
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));
     }
   }
@@ -39,7 +53,7 @@ class LoginRepo{
       return ApiResponse.withSuccess(response);
     }
     catch(e){
-      print("Api Response data exceptionerror= $e");
+      print("Api Response data exception error= $e");
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));
     }
   }

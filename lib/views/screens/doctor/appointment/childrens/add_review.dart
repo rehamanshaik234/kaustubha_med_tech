@@ -5,7 +5,7 @@ import 'package:kaustubha_medtech/views/alerts/book_appointment.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_textfield.dart';
 
 import '../../../../../utils/app_colors/app_colors.dart';
-import '../../../../../utils/routes/route_names.dart';
+import '../../../../../utils/routes/route_names/route_names.dart';
 import '../../../../widgets/custom_button.dart';
 class AddReview extends StatefulWidget {
   const AddReview({super.key});

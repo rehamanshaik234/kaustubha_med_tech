@@ -1,4 +1,4 @@
-package com.app.kaustubha_medtech
+package com.kaustubha_medtech.app
 
 import io.flutter.embedding.android.FlutterActivity
 

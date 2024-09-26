@@ -3,13 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 class CustomOutlineButton extends StatelessWidget {
   CustomOutlineButton({super.key,required this.onPressed,required this.title,this.padding,
-  this.borderRadius,this.height,this.width});
+  this.borderRadius,this.height,this.width,this.textSize,this.borderColor,this.bgColor});
   VoidCallback onPressed;
   String title;
+  Color? bgColor;
   double? padding;
   BorderRadius? borderRadius;
   double? height;
   double? width;
+  double? textSize;
+  Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +20,10 @@ class CustomOutlineButton extends StatelessWidget {
         width: width ?? 1.sw,
         height: height,
         child: OutlinedButton(
-            style: ButtonStyle(backgroundColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-                side: WidgetStatePropertyAll<BorderSide>(BorderSide(color: Colors.black)),
+            style: ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(bgColor ?? Colors.transparent),
+                side: WidgetStatePropertyAll<BorderSide>(BorderSide(color:borderColor ?? Colors.black)),
                 padding: WidgetStatePropertyAll<EdgeInsets>( EdgeInsets.all(padding ?? 12.sp)),
                 shape: WidgetStatePropertyAll<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: borderRadius ?? BorderRadius.circular( 8.sp)))  ),
-            onPressed: onPressed, child: Text(title,style: GoogleFonts.inter(fontWeight: FontWeight.bold,fontSize:16.sp,color: Colors.black ),)));
+            onPressed: onPressed, child: Text(title,style: GoogleFonts.inter(fontWeight: FontWeight.bold,fontSize:textSize ?? 16.sp,color: borderColor ?? Colors.black ),)));
   }
 }

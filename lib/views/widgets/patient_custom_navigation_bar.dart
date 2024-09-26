@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/main.dart';
 import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
-import 'package:kaustubha_medtech/utils/routes/route_names.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names/route_names.dart';
 
 
 
@@ -26,7 +26,6 @@ class _CustomPatientBottomNavBarState extends State<CustomPatientBottomNavBar> {
       widget.onChange(route);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +50,7 @@ class _CustomPatientBottomNavBarState extends State<CustomPatientBottomNavBar> {
                   _buildCustomTab(RoutesName.tracker, "Tracker",Icons.watch_later),
                   _buildCustomTab(RoutesName.consult, "Consult",CupertinoIcons.person_crop_rectangle_fill),
                   _buildCustomTab(RoutesName.patientAppointments, "Appointment",Icons.medical_services),
-                  _buildCustomTab(RoutesName.chat, "Chat",Icons.chat),
+                  _buildCustomTab(RoutesName.contactList, "Chat",Icons.chat),
                 ],
               ),
             ),

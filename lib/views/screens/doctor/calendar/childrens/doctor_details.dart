@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/models/consult/DoctorInfo.dart';
-import 'package:kaustubha_medtech/utils/routes/route_names.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names/route_names.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 
 import '../../../../../utils/app_colors/app_colors.dart';
@@ -69,7 +69,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       bottomSheet: Padding(
         padding: EdgeInsets.all(16.sp),
         child: CustomButton(onPressed: (){
-          Navigator.pushNamed(context, RoutesName.bookAppointment);
+          Navigator.pushNamed(context, RoutesName.appointmentTimeSlot);
         }, title: "Book Appointment",borderRadius: BorderRadius.circular(25.sp),),
       ),
     );

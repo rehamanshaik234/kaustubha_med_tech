@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
 
-import '../../utils/routes/route_names.dart';
+import '../../utils/routes/route_names/route_names.dart';
 class AlreadyHaveAccountWidget extends StatelessWidget {
   const AlreadyHaveAccountWidget({super.key});
 
@@ -16,7 +16,7 @@ class AlreadyHaveAccountWidget extends StatelessWidget {
           SizedBox(width: 4.w,),
           InkWell(
               onTap: ()=>Navigator.pushNamed(context,RoutesName.login),
-              child: Text("Login",style: GoogleFonts.inter(fontWeight: FontWeight.bold,decoration: TextDecoration.underline,color: AppColors.primaryColor),)),
+              child: Text("Login",style: GoogleFonts.inter(fontWeight: FontWeight.bold,decoration: TextDecoration.underline,),)),
         ]
     );
   }

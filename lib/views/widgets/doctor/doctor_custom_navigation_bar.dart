@@ -1,14 +1,10 @@
-import 'dart:ui'; // for the blur effect
 import 'package:blur/blur.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kaustubha_medtech/main.dart';
 import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
-import 'package:kaustubha_medtech/utils/routes/route_names.dart';
-
-
+import 'package:kaustubha_medtech/utils/routes/route_names/route_names.dart';
 
 class CustomDoctorBottomNavBar extends StatefulWidget {
   late Function(String route) onChange;
@@ -48,10 +44,10 @@ class _CustomDoctorBottomNavBarState extends State<CustomDoctorBottomNavBar> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildCustomTab(RoutesName.doctorHome, "Home",Icons.home),
-                  _buildCustomTab(RoutesName.doctorSchedule, "Schedule",Icons.schedule_rounded),
-                  _buildCustomTab(RoutesName.doctorAppointments, "Patients",Icons.person_2),
+                  _buildCustomTab(RoutesName.doctorAppointments, "Schedule",Icons.schedule_rounded),
+                  _buildCustomTab(RoutesName.doctorPatients, "Patients",Icons.person_2),
                   _buildCustomTab(RoutesName.doctorCalendar, "Calendar",CupertinoIcons.calendar_today),
-                  _buildCustomTab(RoutesName.doctorChat, "Chat",Icons.chat),
+                  _buildCustomTab(RoutesName.doctorContactList, "Chat",Icons.chat),
                 ],
               ),
             ),
