@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kaustubha_medtech/controller/providers/patient/patient_appointments.dart';
+import 'package:kaustubha_medtech/utils/constants/constants.dart';
+import 'package:provider/provider.dart';
 
 import '../../../utils/app_colors/app_colors.dart';
 class DoctorFilterOptions extends StatefulWidget {
@@ -11,35 +14,37 @@ class DoctorFilterOptions extends StatefulWidget {
 }
 
 class _DoctorFilterOptionsState extends State<DoctorFilterOptions> {
-  List<String> specialistTypes=["   All   ",'General','Cardiologist','Dentist','Physiologist'];
-  String selectedOption="   All   ";
-
+  List<String> specialistTypes=["   All   ",...Constants.specialisations];
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Padding(
-        padding: EdgeInsets.only(left: 8.0.w,top: 0.w,bottom: 8.h),
-        child: Row(
-          children: [
-            optionContainer(specialistTypes[0], 0),
-            optionContainer(specialistTypes[1], 1),
-            optionContainer(specialistTypes[2], 2),
-            optionContainer(specialistTypes[3], 3),
-            optionContainer(specialistTypes[4], 4),
-          ],
-        ),
+      child: Consumer<PatientAppointmentProvider>(
+        builder: (context,provider,child) {
+          return Padding(
+            padding: EdgeInsets.only(left: 8.0.w,top: 0.w,bottom: 8.h),
+            child: Row(
+              children: [
+                for(int i=0;i<specialistTypes.length;i++)
+                  optionContainer(specialistTypes[i], i,provider.filterModel.specialization==null?specialistTypes[0]:
+                  provider.filterModel.specialization.toString(),provider)
+              ],
+            ),
+          );
+        }
       ),
     );
   }
 
-  Widget optionContainer(String title,int index){
+  Widget optionContainer(String title,int index,String selectedOption,PatientAppointmentProvider provider){
     return GestureDetector(
       onTap: (){
-        selectedOption=title;
-        setState(() {
-
-        });
+        if(title==specialistTypes[0]){
+          provider.setFilter(resetSpecialization: true);
+        }else{
+          provider.setFilter(specialization: title);
+        }
+        provider.getDoctorsList(applyFilter: true,(r){});
       },
       child: Container(
         margin: EdgeInsets.only(right: 8.w),

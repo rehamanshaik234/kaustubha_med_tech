@@ -1,17 +1,23 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kaustubha_medtech/controller/localdb/local_db.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/login_provider.dart';
 import 'package:kaustubha_medtech/models/login/LoginModel.dart';
 import 'package:kaustubha_medtech/models/user/user_info.dart';
 import 'package:kaustubha_medtech/utils/constants/asset_urls.dart';
-import 'package:kaustubha_medtech/utils/routes/route_names.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names/route_names.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_logo_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_textfield.dart';
 import 'package:kaustubha_medtech/views/widgets/dont_have_account.dart';
 import 'package:kaustubha_medtech/views/widgets/logo.dart';
+import 'package:kaustubha_medtech/views/widgets/phone_text_field.dart';
+import 'package:phone_text_field/model/phone_number.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../models/connectivity/error_model.dart';
@@ -26,8 +32,21 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController emailOrNumber=TextEditingController();
+  TextEditingController email=TextEditingController();
+  TextEditingController phone=TextEditingController();
   TextEditingController password=TextEditingController();
+  PhoneNumber? phoneNumber;
+  late GoogleSignIn googleSignIn;
+
+  @override
+  void initState() {
+    if(Platform.isAndroid) {
+      googleSignIn = GoogleSignIn(scopes: ['email'],);
+    }else{
+      googleSignIn= GoogleSignIn(scopes: ['email'],clientId: '64130647433-3a8orgrdtrrntpnj3ltkgjh9g9odn0oo.apps.googleusercontent.com');
+    }
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,26 +64,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: 1.sh*0.08),
                   Text("Log in",style: GoogleFonts.poppins(fontWeight: FontWeight.bold,fontSize: 24.sp)),
                   SizedBox(height: 1.sh*0.04),
-                  CustomTextField(hintText: "Email or Number", textEditingController: emailOrNumber,onChange: (text){setState(() {});},),
                   Visibility(
-                    visible: !Constants.isNumeric(emailOrNumber.text),
-                    child: SizedBox(
-                      child: Column(
-                        children: [
+                    visible: !Constants.emailRegex.hasMatch(email.text),
+                    child: PhoneNumberTextField(hintText: "Phone", initialValue: phone.text,onChange: (text){
+                      phone.text=text?.completeNumber ?? '';
+                      phoneNumber=text;
+                      setState(() {});
+                      },
+                      onSubmit:(number){
+                        phone.text = number.toString();
+                        setState(() {});
+                      } ,
+                    ),
+                  ),
+                  Visibility(
+                    visible: !checkIsNumberValid(),
+                      child: SizedBox(
+                        child: Column(
+                          children: [
+                          SizedBox(height: 24.h,),
+                          CustomTextField(hintText: "Email", textEditingController: email,onChange: (text){setState(() {});},),
                           SizedBox(height: 24.h,),
                           CustomTextField(hintText: "Password", textEditingController: password,isPassword: true,),
-                          SizedBox(height: 10.h,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              InkWell(
-                                  onTap: ()=>Navigator.pushNamed(context,RoutesName.selectVerificationType),
-                                  child: Text('Forgot Password?',style: GoogleFonts.inter(fontWeight: FontWeight.w500,fontSize: 14.sp),)),
-                            ],
-                          ),
                         ],
-                      ),
                     ),
+                  )),
+                  SizedBox(height: 10.h,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                          onTap: () => Navigator.pushNamed(context,RoutesName.selectVerificationType),
+                          child: Text('Forgot Password?',style: GoogleFonts.inter(fontWeight: FontWeight.w500,fontSize: 14.sp),)),
+                    ],
                   ),
                   SizedBox(height: 24.h,),
                   CustomButton(onPressed: ()=>login(provider), title: "Log in",loader: provider.loader,),
@@ -83,18 +115,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: CustomLogoButton(onPressed: (){}, title: "Continue With Google", logoUrl: AssetUrls.googleLogo),
+                        child: CustomLogoButton(onPressed: ()=>loginWithEmail(provider), title: "Continue With Google", logoUrl: AssetUrls.googleLogo,loading: provider.signInLoader,),
                       ),
                     ],
                   ),
-                  SizedBox(height: 24.h,),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomLogoButton(onPressed: (){}, title: "Continue With Apple", logoUrl: AssetUrls.appleLogo),
-                      ),
-                    ],
-                  ),
+                  // SizedBox(height: 24.h,),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: CustomLogoButton(onPressed: (){}, title: "Continue With Apple", logoUrl: AssetUrls.appleLogo),
+                  //     ),
+                  //   ],
+                  // ),
                   SizedBox(height: 40.h,),
                   const DontHaveAccountWidget(),
                   SizedBox(height: 32.h,),
@@ -109,13 +141,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void logInWithEmailPwd(LoginProvider provider)async{
     if(validateEmail()){
-      LoginModel loginModel=LoginModel(email: emailOrNumber.text,password: password.text);
+      LoginModel loginModel=LoginModel(email: email.text,password: password.text);
       provider.loginWithEmilPwd(loginModel, onLoginEmailResponse);
     }
   }
 
   void login(LoginProvider provider)async{
-    if(Constants.isNumeric(emailOrNumber.text)){
+    if(phone.text.isNotEmpty && checkIsNumberValid()){
       logInWithNumber(provider);
     }else{
       logInWithEmailPwd(provider);
@@ -123,15 +155,24 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void logInWithNumber(LoginProvider provider)async{
-    if(validateNumber()){
-      LoginModel loginModel=LoginModel(phone: "+91${emailOrNumber.text}");
-      provider.sendOTPNumber(loginModel, onSendOTPNumberResponse);
+      if(validateNumber()){
+        LoginModel loginModel = LoginModel(phone: phone.text);
+        provider.sendOTPNumber(loginModel, onSendOTPNumberResponse);
+      }
+  }
+
+  void loginWithEmail(LoginProvider provider)async {
+    final result=await googleSignIn.signIn();
+    googleSignIn.signOut();
+    if(result==null && result?.email==null){
+      return;
     }
+    await provider.loginWithEmail(result!.email.toString(), onLoginEmailResponse);
   }
 
   void onSendOTPNumberResponse(ResponseMessage message) {
     if (message.success != null) {
-      Map<String, dynamic>? arguments = {'number': "+91${emailOrNumber.text}"};
+      Map<String, dynamic>? arguments = {'number': phone.text};
       Navigator.pushNamed(context, RoutesName.verifyLoginOTP, arguments: arguments);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
@@ -140,21 +181,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void onLoginEmailResponse(ResponseMessage message) {
     if (message.success != null) {
-      CustomPopUp.showSnackBar(context, "${message.success}", Colors.greenAccent);
+      UserInfo userInfo=UserInfo.fromJson(message.user);
+      if(userInfo.emailVerified==null&& userInfo.numberVerified==false){
+        Navigator.pushNamed(context, RoutesName.verifySignUpOTP,arguments: {'email':userInfo.email});
+        return;
+      }
+      CustomPopUp.showSnackBar(context, "${message.success}", Colors.green);
       LocalDB.setUserLogin(true);
-      LocalDB.setUserInfo(message.user ?? UserInfo());
-      Navigator.pushNamedAndRemoveUntil(context,RoutesName.patientMain,(r)=>false);
+      LocalDB.setUserInfo( UserInfo.fromJson(message.user));
+      Navigator.pushNamedAndRemoveUntil(context,UserInfo.fromJson(message.user).role==Constants.patientRole? RoutesName.patientMain:RoutesName.doctorMain,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }
   }
 
-
   bool validateEmail(){
-    if (emailOrNumber.text.isEmpty) {
+    if (email.text.isEmpty && phone.text.isEmpty) {
       CustomPopUp.showSnackBar(context, "Enter Email or Number", Colors.redAccent);
       return false;
-    } else if (!Constants.emailRegex.hasMatch(emailOrNumber.text)) {
+    }
+    else if (email.text.isNotEmpty && !Constants.emailRegex.hasMatch(email.text)) {
       CustomPopUp.showSnackBar(context, "Enter Valid Email", Colors.redAccent);
       return false;
     } else if(validatePasswords()){
@@ -173,14 +219,47 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
-  bool validateNumber(){
-    if(emailOrNumber.text.replaceAll(" ", '').length!=10){
-      CustomPopUp.showSnackBar(context, "Enter Valid Number", Colors.redAccent);
+  bool validateNumber() {
+    if (phone.text.isEmpty) {
+      CustomPopUp.showSnackBar(context, "Enter Phone Number", Colors.redAccent);
       return false;
-    }else{
+    }
+    try {
+      if (phoneNumber?.isValidNumber() != true) {
+        CustomPopUp.showSnackBar(context, "Enter Valid Number", Colors.redAccent);
+        return false;
+      }
+    } catch (e) {
+      if (e is NumberTooShortException) {
+        CustomPopUp.showSnackBar(context, "Phone number is too short", Colors.redAccent);
+      } else {
+        CustomPopUp.showSnackBar(context, "Enter Valid Number", Colors.redAccent);
+      }
+      return false;
+    }
+    return true;
+  }
+
+
+  bool checkIsNumberValid(){
+    try {
+      if (phoneNumber?.isValidNumber() != true) {
+        return false;
+      }
       return true;
+    } catch (e) {
+      return false;
     }
   }
+
+
+  void loginWithGmail()async{
+    final resp= await googleSignIn.signIn();
+    if(resp!=null && resp.email.isNotEmpty){
+
+    }
+  }
+
+
 
 }

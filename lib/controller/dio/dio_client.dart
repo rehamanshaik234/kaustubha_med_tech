@@ -56,7 +56,7 @@ class DioClient {
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress,
       );
-      print('Response body: ${response.data}');
+      // print('Response body: ${response.data}');
       return response;
     } on SocketException catch (e) {
       throw SocketException(e.toString());

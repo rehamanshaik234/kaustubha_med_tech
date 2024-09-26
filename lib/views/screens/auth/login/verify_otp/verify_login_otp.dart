@@ -12,7 +12,7 @@ import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/otp_text_field.dart';
 
 import '../../../../../models/connectivity/error_model.dart';
-import '../../../../../utils/routes/route_names.dart';
+import '../../../../../utils/routes/route_names/route_names.dart';
 import '../../../../alerts/custom_alerts.dart';
 class VerifyLoginOTP extends StatefulWidget {
   const VerifyLoginOTP({super.key});
@@ -35,6 +35,7 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
 
   String? email;
   String? number;
+  bool resendOTPLoader=false;
 
 
   @override
@@ -68,27 +69,29 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: (){},textEditingController: otp1,),
-                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp2,),
-                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp3,),
-                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp4,),
-                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp5,),
-                          OtpTextField(nextFocus:()=> verifyOTP(provider),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp6,),
+                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: (){},textEditingController: otp1,onOtpPasted: (text){pasteOtp(text);verifyOTP(provider,pastedOtp: text);},),
+                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp2,onOtpPasted: (text){pasteOtp(text);verifyOTP(provider,pastedOtp: text);},),
+                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp3,onOtpPasted: (text){pasteOtp(text);verifyOTP(provider,pastedOtp: text);},),
+                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp4,onOtpPasted: (text){pasteOtp(text);verifyOTP(provider,pastedOtp: text);},),
+                          OtpTextField(nextFocus: ()=>focusNode.nextFocus(),prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp5,onOtpPasted: (text){pasteOtp(text);verifyOTP(provider,pastedOtp: text);},),
+                          OtpTextField(nextFocus:() {},prevFocus: ()=>focusNode.previousFocus(),textEditingController: otp6,onOtpPasted: (text){pasteOtp(text);verifyOTP(provider,pastedOtp: text);},),
                         ],
                       ),
                       SizedBox(
                         height: 30.h,
                       ),
-                      CustomButton(onPressed: ()=> verifyOTP(provider), title: "verify",loader: provider.loader,),
+                      CustomButton(onPressed: ()=> verifyOTP(provider), title: "verify",loader: provider.loader&& !resendOTPLoader ),
                       SizedBox(
                         height: 20.h,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Haven’t got the link yet?",style: GoogleFonts.inter(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.grey)),
+                          Text("Haven’t got the OTP yet?",style: GoogleFonts.inter(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.grey)),
                           SizedBox(width: 8.w,),
-                          Text("Resend",style: GoogleFonts.inter(fontWeight: FontWeight.bold,fontSize: 14.sp,),)
+                          InkWell(
+                              onTap: ()=>resendOTP(provider),
+                              child: Text(resendOTPLoader?"Resending..":"Resend",style: GoogleFonts.inter(fontWeight: FontWeight.bold,fontSize: 14.sp,),))
                         ],
                       )
                     ],
@@ -101,6 +104,17 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
     );
 
   }
+  void pasteOtp(String otp){
+    if(otp.length==6){
+      otp1.text=otp[0];
+      otp2.text=otp[1];
+      otp3.text=otp[2];
+      otp4.text=otp[3];
+      otp5.text=otp[4];
+      otp6.text=otp[5];
+      setState(() {});
+    }
+  }
 
   void verifyLoginOtp(LoginProvider provider,String otp)async{
     Map<String,dynamic> data=LoginModel(phone: number,otp: otp).toJson();
@@ -111,15 +125,15 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
     if (message.success != null) {
       CustomPopUp.showSnackBar(context, "Login Successfully", Colors.green);
       LocalDB.setUserLogin(true);
-      LocalDB.setUserInfo(message.user ?? UserInfo());
+      LocalDB.setUserInfo(UserInfo.fromJson(message.user));
       Navigator.pushNamedAndRemoveUntil(context,RoutesName.patientMain,(r)=>false);
     } else {
       CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
     }
   }
 
-  void verifyOTP(LoginProvider provider)async {
-    String otp = otp1.text + otp2.text + otp3.text + otp4.text + otp5.text + otp6.text;
+  void verifyOTP(LoginProvider provider,{String? pastedOtp})async {
+    String otp = pastedOtp ?? (otp1.text + otp2.text + otp3.text + otp4.text + otp5.text + otp6.text);
     if(otp.length==6) {
       if(number!=null){
         verifyLoginOtp(provider, otp);
@@ -140,5 +154,26 @@ class _VerifyLoginOTPState extends State<VerifyLoginOTP> {
       setState(() {});
     }
   }
+
+  void resendOTP(LoginProvider provider)async{
+    if(resendOTPLoader){
+      return;
+    }
+      LoginModel loginModel = LoginModel(phone: number);
+      resendOTPLoader=true;
+      setState(() {});
+      provider.sendOTPNumber(loginModel, onSendOTPNumberResponse);
+  }
+
+  void onSendOTPNumberResponse(ResponseMessage message) {
+    if (message.success != null) {
+      CustomPopUp.showSnackBar(context, "Resent OTP", Colors.green);
+    } else {
+      CustomPopUp.showSnackBar(context, "${message.error}", Colors.redAccent);
+    }
+    resendOTPLoader=false;
+    setState(() {});
+  }
+
 }
 

@@ -6,7 +6,7 @@ import 'package:kaustubha_medtech/main.dart';
 class CustomTextField extends StatefulWidget {
   CustomTextField({super.key,required this.hintText,this.isPassword=false,this.inputType=TextInputType.text,
     required this.textEditingController,this.focusNode,this.onEditingCompleted,this.onChange,this.readOnly,
-    this.outlinedBorder,this.includeSpacing,this.border,this.lines=1,this.outlineColor,this.fillColor});
+    this.outlinedBorder,this.includeSpacing,this.border,this.lines=1,this.outlineColor,this.fillColor,this.onTap,this.validator,this.suffix,this.textInputAction,this.prefix});
   String hintText;
   bool isPassword;
   TextInputType inputType;
@@ -20,7 +20,12 @@ class CustomTextField extends StatefulWidget {
   Color? outlineColor;
   InputBorder? border;
   int lines;
+  VoidCallback? onTap;
   Color? fillColor;
+  String? Function(String?)? validator;
+  Widget? suffix;
+  Widget? prefix;
+  TextInputAction? textInputAction;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -30,13 +35,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
   bool showPassword=true;
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+        validator: widget.validator,
         controller: widget.textEditingController,
         keyboardType: widget.inputType,
         obscureText: widget.isPassword? showPassword : false,
         focusNode: widget.focusNode,
         readOnly: widget.readOnly!=null?widget.readOnly ?? false :false,
         onEditingComplete: widget.onEditingCompleted,
+        textCapitalization: TextCapitalization.sentences,
         onChanged: (text){
           if(widget.includeSpacing==null || widget.includeSpacing==false) {
             int cursorPosition = widget.textEditingController.selection
@@ -50,9 +57,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
             if (widget.onChange != null) {
               widget.onChange!(newText);
             }
+            setState(() {});
           }
         },
+        onTap:widget.onTap,
         maxLines: widget.lines,
+        textInputAction: widget.textInputAction,
         decoration: InputDecoration(
           hintText: widget.hintText,
           focusColor: Colors.black,
@@ -63,12 +73,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
             borderSide: BorderSide(color:  Colors.black26,width: 2.w),
             borderRadius: BorderRadius.circular(12.sp)
           ):null,
-          suffixIcon: widget.isPassword? IconButton(onPressed: (){
+          prefixIcon: widget.prefix,
+          suffixIcon: widget.suffix ??( widget.isPassword? IconButton(onPressed: (){
             setState(() {
               showPassword=!showPassword;
             });
           }, icon: Icon(!showPassword? CupertinoIcons.eye_solid:CupertinoIcons.eye_slash )):null
-        ),
+        )),
     );
   }
 }

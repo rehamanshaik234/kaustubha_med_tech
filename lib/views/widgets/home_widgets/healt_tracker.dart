@@ -13,7 +13,7 @@ import 'package:kaustubha_medtech/views/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:kaustubha_medtech/controller/providers/authentication/sign_up_provider.dart';
 import 'package:kaustubha_medtech/utils/constants/constants.dart';
-import 'package:kaustubha_medtech/utils/routes/route_names.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names/route_names.dart';
 import 'package:kaustubha_medtech/views/alerts/custom_alerts.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_button.dart';
 import 'package:kaustubha_medtech/views/widgets/custom_textfield.dart';
@@ -49,7 +49,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 1.sh*0.05),
-                    const LogoWidget(),
+                    LogoWidget(),
                     SizedBox(height: 24.h),
                     Text("Sign Up",style: GoogleFonts.poppins(fontWeight: FontWeight.bold,fontSize: 24.sp)),
                     SizedBox(height: 24.h),

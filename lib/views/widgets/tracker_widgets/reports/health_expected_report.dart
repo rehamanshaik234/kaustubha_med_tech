@@ -128,7 +128,6 @@ class HealthExpectedReport extends StatelessWidget {
 
 class _ChartData {
   _ChartData(this.week, this.expected, this.health);
-
   final String week;
   final num expected;
   final num health;

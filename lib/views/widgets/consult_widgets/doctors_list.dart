@@ -2,11 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kaustubha_medtech/controller/providers/patient/patient_appointments.dart';
 import 'package:kaustubha_medtech/main.dart';
+import 'package:kaustubha_medtech/models/appointments/DoctorDetailsModel.dart';
 import 'package:kaustubha_medtech/models/consult/DoctorInfo.dart';
 import 'package:kaustubha_medtech/utils/app_colors/app_colors.dart';
 import 'package:kaustubha_medtech/utils/constants/asset_urls.dart';
-import 'package:kaustubha_medtech/utils/routes/route_names.dart';
+import 'package:kaustubha_medtech/utils/routes/route_names/route_names.dart';
+import 'package:provider/provider.dart';
 
 class DoctorsList extends StatefulWidget {
   const DoctorsList({super.key});
@@ -17,54 +20,61 @@ class DoctorsList extends StatefulWidget {
 
 class _DoctorsListState extends State<DoctorsList> {
 
-  List<DoctorInfo> data= [
-    DoctorInfo(
-      doctorName: 'Dr. David Patel',
-      doctorSpecialist: "Obstetricians",
-      address: 'Cardiology Center, USA',
-      ratings: 5,
-      reviewsCount: 1200
-    ),
-    DoctorInfo(
-      doctorName: 'Dr. David Patel',
-      doctorSpecialist: "Obstetricians",
-      address: 'Cardiology Center, USA',
-      ratings: 5,
-      reviewsCount: 1200
-    ),
-    DoctorInfo(
-      doctorName: 'Dr. David Patel',
-      doctorSpecialist: "Obstetricians",
-      address: 'Cardiology Center, USA',
-      ratings: 5,
-      reviewsCount: 1200
-    ),
-    DoctorInfo(
-      doctorName: 'Dr. David Patel',
-      doctorSpecialist: "Obstetricians",
-      address: 'Cardiology Center, USA',
-      ratings: 5,
-      reviewsCount: 1200
-    ),
-  ];
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      getDoctors();
+    });
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: data.length,
-        itemBuilder: (context,index){
-          return doctorCard(index);
-        });
+    return Column(
+      children: [
+        Consumer<PatientAppointmentProvider>(
+          builder: (context,provider,_) {
+            if(provider.loader){
+              return SizedBox(
+                 height: 0.7.sh,
+                  child: const Center(child: CircularProgressIndicator(color: Colors.black,),));
+            }
+            if(provider.search!=null && provider.searched.isNotEmpty){
+              return ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: provider.searched.length,
+                  itemBuilder: (context,index){
+                    return doctorCard(provider.searched[index],index);
+                  });
+            }
+            if(provider.doctorsList.isEmpty || (provider.searched.isEmpty && provider.search?.isNotEmpty==true)){
+              return SizedBox(
+                  height: 0.7.sh,
+                  child: Center(child: Text("No Doctors Found",style: GoogleFonts.dmSans(fontSize: 16.sp),)));
+            }
+
+            return ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: provider.doctorsList.length,
+                itemBuilder: (context,index){
+                  return doctorCard(provider.doctorsList[index],index);
+                });
+          }
+        ),
+        SizedBox(height: 60.h,)
+      ],
+    );
   }
 
-  Widget doctorCard(int index){
+  Widget doctorCard(DoctorDetailsModel doctorDet, int index){
     return Container(
-      margin: data.length==(index+1)? EdgeInsets.only(bottom: 50.h):EdgeInsets.zero,
+      margin: index==(index+1)? EdgeInsets.only(bottom: 50.h):EdgeInsets.zero,
       padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: InkWell(
-        onTap: ()=>Navigator.of(context,rootNavigator: true).pushNamed(RoutesName.patientDoctorDetails,arguments: {"doctor_id":data[index].doctorName}),
+        onTap: ()=>Navigator.of(context,rootNavigator: true).pushNamed(RoutesName.patientDoctorDetails,arguments: {"doctor_id":doctorDet.id}),
         child: Card(
           color: Colors.white,
           child: Padding(
@@ -72,7 +82,27 @@ class _DoctorsListState extends State<DoctorsList> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image(image: AssetImage(AssetUrls.doctorProfile),height: 100.h,),
+                ClipRRect(
+                 borderRadius: BorderRadius.circular(8.sp),
+              child: Image(image:doctorDet.image!=null?NetworkImage(doctorDet.image): AssetImage(AssetUrls.doctorProfile),
+                      height: 100.h,width: 100.w,fit: BoxFit.cover,
+                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                            : null, // Show indeterminate progress if total size is unknown
+                      ),
+                    );
+                  }
+                },
+                errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                  return Image(image: AssetImage(AssetUrls.doctorProfile),);
+                },
+              )),
                 SizedBox(width: 8.w,),
                 Expanded(
                   child: Column(
@@ -82,31 +112,27 @@ class _DoctorsListState extends State<DoctorsList> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(data[index].doctorName ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
+                          Text(doctorDet.profile?.legalName ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w700,fontSize: 16.sp),),
                           Icon(CupertinoIcons.heart,color: Colors.grey,size: 20.sp,)
                         ],
                       ),
                       SizedBox(height: 8.h,),
                       Divider(color: Colors.grey.shade400,height: 2.h,),
                       SizedBox(height: 4.h,),
-                      Text(data[index].doctorSpecialist ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w600,fontSize: 14.sp,color: Colors.black54),),
+                      Text(doctorDet.profile?.specialization ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w600,fontSize: 14.sp,color: Colors.black54),),
                       SizedBox(height: 4.h,),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on_outlined,color: Colors.grey,size: 16.sp,),
-                          Text(data[index].address ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
-                        ],
-                      ),
+                      Text("₹ ${doctorDet.profile?.consultationFees ?? "0"}" ,style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
                       SizedBox(height: 4.h,),
                       Row(
                         children: [
                           Icon(Icons.star,color: AppColors.ratingColor,size: 20.sp,),
                           SizedBox(width: 2.w,),
-                          Text("${data[index].ratings ?? "0"}" ,style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
+                          Text(doctorDet.profile?.experienceYears ?? "0" ,style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
                           SizedBox(width: 8.w,),
                           Container(height: 10.h,width: 1.w,color: Colors.grey,),
                           SizedBox(width: 8.w,),
-                          Text("${data[index].reviewsCount ?? "0"} Reviews" ,style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54),),
+                          Icon(Icons.location_on_outlined,color: Colors.grey,size: 16.sp,),
+                          Expanded(child: Text(doctorDet.profile?.address ?? "",style: GoogleFonts.inter(fontWeight: FontWeight.w400,fontSize: 14.sp,color: Colors.black54,),overflow: TextOverflow.ellipsis,)),
                         ],
                       ),
                     ],
@@ -118,6 +144,13 @@ class _DoctorsListState extends State<DoctorsList> {
         ),
       ),
     );
+  }
+
+  void getDoctors(){
+    PatientAppointmentProvider provider=Provider.of<PatientAppointmentProvider>(context,listen: false);
+    if(provider.doctorsList.isEmpty){
+      provider.getDoctorsList((r){});
+    }
   }
 
 }

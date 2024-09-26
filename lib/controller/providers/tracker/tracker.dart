@@ -26,12 +26,12 @@ class TrackerProvider extends ChangeNotifier{
 
   TrackerRepo trackerRepo=TrackerRepo();
 
-  Future<void> getPatientTracker(Function(ResponseMessage message) onResponse)async{
+  Future<void> getPatientTracker(Function(ResponseMessage message) onResponse,{String? userId})async{
     _loader=true;
     _error='';
     notifyListeners();
     UserInfo? userid=await LocalDB.getUserInfo();
-    Map<String,dynamic> params= { UserInfo.userIdKey :userid?.id} ;
+    Map<String,dynamic> params= {UserInfo.userIdKey : userId ?? userid?.id} ;
     ApiResponse apiResponse = await trackerRepo.getPatientTracker(params);
     print("apiResponse.Data.success ${apiResponse.response?.data.toString()}");
     if( apiResponse.response != null && apiResponse.response?.statusCode == 200 ){

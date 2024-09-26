@@ -4,10 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class OtpTextField extends StatelessWidget {
-  OtpTextField({super.key,required this.nextFocus,required this.prevFocus,required this.textEditingController});
+  OtpTextField({super.key,required this.nextFocus,required this.prevFocus,required this.textEditingController,this.onOtpPasted});
   VoidCallback nextFocus;
   VoidCallback prevFocus;
   TextEditingController textEditingController;
+  Function(String)? onOtpPasted;
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +23,18 @@ class OtpTextField extends StatelessWidget {
       child: TextFormField(
         controller: textEditingController,
         onChanged: (text){
-          nextFocus();
-          if(text.isNotEmpty){
-            textEditingController.text=text[text.length-1];
-          }else{
-            prevFocus();
+          if(text.length==6 && text.contains(RegExp(r'^\d{6}$'))){
+            if(onOtpPasted!=null) {
+              onOtpPasted!(text);
+              return;
+            }
+          }else {
+            nextFocus();
+            if (text.isNotEmpty) {
+              textEditingController.text = text[text.length - 1];
+            } else {
+              prevFocus();
+            }
           }
         },
         keyboardType: TextInputType.number,
